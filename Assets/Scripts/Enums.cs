@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public enum PuyoColor {
+﻿public enum PuyoColor {
 	Blue,
 	Red,
 	Yellow,
