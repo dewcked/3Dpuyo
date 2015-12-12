@@ -29,6 +29,6 @@ public class Puyo : MonoBehaviour
 
         var chainCount = managerScript.FindChain(this);
 
-        EditorUtility.DisplayDialog("Toast", chainCount.Count().ToString(), "ok");
+        EditorUtility.DisplayDialog("Toast", chainCount.Puyos.Count().ToString(), "ok");
     }
 }

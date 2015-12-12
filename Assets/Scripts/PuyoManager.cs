@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor.Animations;
 
 public class PuyoManager : MonoBehaviour {
 
@@ -40,6 +41,19 @@ public class PuyoManager : MonoBehaviour {
 		}
 	}
 
+    private void DestroyAllChains()
+    {
+        var chains = FindAllChains();
+        foreach (var chain in chains)
+        {
+            foreach (var puyo in chain.Puyos)
+            {
+                Destroy(puyos[puyo.Row, puyo.Column]);
+                puyos[puyo.Row, puyo.Column] = null;
+            }
+        }
+    }
+
 	private PuyoColor GetPuyoColorFromString(string str){
 		switch (str) {
 			case "Blue":
@@ -71,10 +85,47 @@ public class PuyoManager : MonoBehaviour {
 	IEnumerator DestroyCoroutine(){
 		yield return new WaitForSeconds(5f);
 
-		DestroyAllOfColor (PuyoColor.Red);
+		//DestroyAllOfColor (PuyoColor.Red);
+        DestroyAllChains();
 	}
+
+    public List<PuyoGroup> FindAllChains()
+    {
+        var chains = new List<PuyoGroup>();
+        
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                var p = puyos[i, j];
+
+                // Is null ?
+                if (p == null) continue;
+
+                var pscript = p.GetComponent<Puyo>();
+
+                // Is already in a group ?
+                bool alreadyInGroup = false;
+                foreach (var group in chains)
+                {
+                    if (group.ContainPuyo(pscript))
+                    {
+                        alreadyInGroup = true;
+                        continue;
+                    }
+                }
+                if(alreadyInGroup) continue;
+
+                var newGroup = FindChain(pscript);
+
+                if(newGroup != null) chains.Add(newGroup);
+            }
+        }
+
+        return chains;
+    }
     
-    public IEnumerable<Puyo> FindChain(Puyo puyo)
+    public PuyoGroup FindChain(Puyo puyo)
     {
         var currentChain = new List<Puyo> {puyo};
         var nextPuyosToCheck = new List<Puyo> {puyo};
@@ -92,7 +143,7 @@ public class PuyoManager : MonoBehaviour {
             nextPuyosToCheck.Remove(pi);
         }
         
-        return currentChain;
+        return currentChain.Count >= 4 ? new PuyoGroup(currentChain) : null;
     }
 
     private Puyo findNextPuyoInChain(Puyo puyo, IEnumerable<Puyo> ignoredPuyos)
@@ -172,9 +223,19 @@ public class PuyoManager : MonoBehaviour {
 	}
 }
 
-public class PuyoChain
+public class PuyoGroup
 {
-    public IEnumerable<Vector2> PuyoPositions { get; set; }
+    public PuyoGroup(IEnumerable<Puyo> puyos)
+    {
+        this.Puyos = puyos;
+    }
+
+    public IEnumerable<Puyo> Puyos { get; set; }
+
+    public bool ContainPuyo(Puyo puyo)
+    {
+        return Puyos.Any(p => p.Row == puyo.Row && p.Column == puyo.Column);
+    }
 }
 
 public enum GameState{
