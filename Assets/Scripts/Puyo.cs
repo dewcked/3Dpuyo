@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
+using UnityEditor;
 
 public class Puyo : MonoBehaviour {
 
@@ -24,5 +26,22 @@ public class Puyo : MonoBehaviour {
 		this.Column = column;
 		this.Color = color;
 	}
+
+    void OnMouseDown()
+    {
+
+        //EditorUtility.DisplayDialog("Puyo Position", string.Format("Row {0}, Column {1}", this.Row, this.Column), "ok");
+
+
+        var manager = GameObject.Find("PuyoManager");
+        var managerScript = (PuyoManager)manager.GetComponent<PuyoManager>();
+        //var hasSameColorNeighbor = managerScript.HasSameColorNeighbor(this);
+
+
+        var chainCount = managerScript.FindChain(this);
+
+        EditorUtility.DisplayDialog("Toast", chainCount.Count().ToString(), "ok");
+    }
+
 
 }
