@@ -44,13 +44,20 @@ public class PuyoManager : MonoBehaviour {
                 isBusy = false;
                 break;
             case GameState.Repositioning:
+                isBusy = true;
+                MovePuyos();
+                state = GameState.None;
+                isBusy = false;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
-
+    private void MovePuyos()
+    {
+        
+    }
 
     private void InitArray()
     {
@@ -78,10 +85,23 @@ public class PuyoManager : MonoBehaviour {
         {
             foreach (var puyo in chain.Puyos)
             {
-                Destroy(puyos[puyo.Row, puyo.Column]);
-                puyos[puyo.Row, puyo.Column] = null;
+                StartCoroutine(AnimateAndDestroy(puyo));
             }
         }
+    }
+
+    IEnumerator AnimateAndDestroy(Puyo puyo)
+    {
+        var animationComponent = puyos[puyo.Row, puyo.Column].GetComponent<Animation>();
+        animationComponent.Play();
+
+        do
+        {
+            yield return null;
+        } while (animationComponent.isPlaying);
+
+        Destroy(puyos[puyo.Row, puyo.Column]);
+        puyos[puyo.Row, puyo.Column] = null;
     }
 
     private PuyoColor GetPuyoColorFromString(string str)
