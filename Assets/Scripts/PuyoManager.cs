@@ -132,10 +132,12 @@ public class PuyoManager : MonoBehaviour {
                     var oldPosition = puyo.transform.position;
                     var newPosition = new Vector3((bottomLeft.y + j * puyoSize.y), bottomLeft.x + i * puyoSize.x); // todo externalize (used in Init and here)
 
+                    // Position is correct, skip and continue with the next puyo
+                    if (oldPosition.y == newPosition.y) continue;
+
                     var ratio = (oldPosition.y - newPosition.y) /puyoSize.y;
                     if (ratio > biggestRatio) biggestRatio = ratio;
                     
-
                     // Without tween
                     //puyo.transform.position = newPosition;
 
