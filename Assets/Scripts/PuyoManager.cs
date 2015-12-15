@@ -45,7 +45,8 @@ public class PuyoManager : MonoBehaviour {
                 break;
             case GameState.Repositioning:
                 isBusy = true;
-                MovePuyos();
+                //StartCoroutine(ComputeNewPuyosPosition());
+                //StartCoroutine(MovePuyosToNewPosition());
                 state = GameState.None;
                 isBusy = false;
                 break;
@@ -54,9 +55,93 @@ public class PuyoManager : MonoBehaviour {
         }
     }
 
+    public void UpdatePuyosPosition()
+    {
+        ComputeNewPuyosPosition();
+        MovePuyosToNewPosition();
+    }
+
     private void MovePuyos()
     {
-        
+        //yield return new WaitForSeconds(10f);
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                if (i < 0 && puyos[i - 1, j] != null)
+                {
+                    var pos = puyos[i, j].transform.position;
+                    pos.y -= puyoSize.y;
+                    puyos[i, j].transform.positionTo(2f, pos);
+                }
+            }
+        }
+    }
+
+    private void ComputeNewPuyosPosition()
+    {
+        //yield return new WaitForSeconds(10f);
+
+        bool puyoHasToMove = true;
+        while (puyoHasToMove)
+        {
+            puyoHasToMove = false;
+            for (int i = 1; i < GameVariable.Rows; i++)
+            {
+                for (int j = 0; j < GameVariable.Columns; j++)
+                {
+                    var puyoGo = puyos[i, j];
+                    if (puyoGo != null)
+                    {
+                        // PUYO UNDER IS NULL
+                        if (puyos[i - 1, j] == null)
+                        {
+                            // SHIFT ALL TOP PUYOS
+                            for (int k = i; k < GameVariable.Rows; k++)
+                            {
+                                var topPuyo = puyos[k, j];
+                                if (topPuyo != null)
+                                {
+                                    puyos[k - 1, j] = topPuyo;
+                                    puyos[k - 1, j].GetComponent<Puyo>().Row--;
+                                    puyos[k, j] = null;
+                                }
+                            }
+                            puyoHasToMove = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    void MovePuyosToNewPosition()
+    {
+        //yield return new WaitForSeconds(15f);
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                var puyo = puyos[i, j];
+                if (puyo != null)
+                {
+                    var oldPosition = puyo.transform.position;
+                    var newPosition = new Vector3((bottomLeft.y + j * puyoSize.y), bottomLeft.x + i * puyoSize.x); // todo externalize (used in Init and here)
+
+                    var ratio = (oldPosition.y - newPosition.y) /puyoSize.y;
+                    var speed = 0.3f; // todo externalize
+
+                    // Without tween
+                    //puyo.transform.position = newPosition;
+
+                    // With tween
+                    puyo.transform.positionTo(speed * ratio, newPosition);
+                }
+                
+            }
+        }
     }
 
     private void InitArray()
@@ -88,6 +173,11 @@ public class PuyoManager : MonoBehaviour {
                 StartCoroutine(AnimateAndDestroy(puyo));
             }
         }
+    }
+
+    IEnumerator Wait()
+    {
+        yield return new WaitForSeconds(5f);
     }
 
     IEnumerator AnimateAndDestroy(Puyo puyo)

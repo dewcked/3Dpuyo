@@ -27,8 +27,10 @@ public class Puyo : MonoBehaviour
         //var hasSameColorNeighbor = managerScript.HasSameColorNeighbor(this);
 
 
-        var chainCount = managerScript.FindChain(this);
+        managerScript.UpdatePuyosPosition();
 
-        EditorUtility.DisplayDialog("Toast", chainCount.Puyos.Count().ToString(), "ok");
+        //var chainCount = managerScript.FindChain(this);
+
+        //EditorUtility.DisplayDialog("Toast", chainCount.Puyos.Count().ToString(), "ok");
     }
 }
