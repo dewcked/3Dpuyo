@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEditor.Animations;
 
 public class PuyoManager : MonoBehaviour {
@@ -27,7 +28,7 @@ public class PuyoManager : MonoBehaviour {
 
     private bool isBusy = false;
 
-    void FixedUpdate()
+    void Update()
     {
         if (isBusy) return;
 
@@ -40,15 +41,14 @@ public class PuyoManager : MonoBehaviour {
             case GameState.CheckAndDestroy:
                 isBusy = true;
                 DestroyAllChains();
-                state = GameState.Repositioning;
-                isBusy = false;
                 break;
             case GameState.Repositioning:
                 isBusy = true;
+                UpdatePuyosPosition();
+
                 //StartCoroutine(ComputeNewPuyosPosition());
                 //StartCoroutine(MovePuyosToNewPosition());
-                state = GameState.None;
-                isBusy = false;
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -58,7 +58,7 @@ public class PuyoManager : MonoBehaviour {
     public void UpdatePuyosPosition()
     {
         ComputeNewPuyosPosition();
-        MovePuyosToNewPosition();
+        StartCoroutine(MovePuyosToNewPosition());
     }
 
     private void MovePuyos()
@@ -116,9 +116,11 @@ public class PuyoManager : MonoBehaviour {
         }
     }
     
-    void MovePuyosToNewPosition()
+    IEnumerator MovePuyosToNewPosition()
     {
-        //yield return new WaitForSeconds(15f);
+        var biggestRatio = 0f;
+        var speed = 0.25f; // todo externalize
+
 
         for (int i = 0; i < GameVariable.Rows; i++)
         {
@@ -131,7 +133,8 @@ public class PuyoManager : MonoBehaviour {
                     var newPosition = new Vector3((bottomLeft.y + j * puyoSize.y), bottomLeft.x + i * puyoSize.x); // todo externalize (used in Init and here)
 
                     var ratio = (oldPosition.y - newPosition.y) /puyoSize.y;
-                    var speed = 0.3f; // todo externalize
+                    if (ratio > biggestRatio) biggestRatio = ratio;
+                    
 
                     // Without tween
                     //puyo.transform.position = newPosition;
@@ -139,10 +142,37 @@ public class PuyoManager : MonoBehaviour {
                     // With tween
                     puyo.transform.positionTo(speed * ratio, newPosition);
                 }
-                
             }
         }
+
+        yield return new WaitForSeconds(biggestRatio * speed);
+
+        state = GameState.CheckAndDestroy;
+        isBusy = false;
     }
+
+    private bool CheckIfAllPuyosAreWellPositioned()
+    {
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                if (!IsPuyoPositionCorrect(puyos[i, j])) return false;
+            }
+        }
+        return true;
+    }
+
+    private bool IsPuyoPositionCorrect(GameObject puyoGo)
+    {
+        if(puyoGo == null) throw new ArgumentNullException();
+
+        var puyoScript = puyoGo.GetComponent<Puyo>();
+        var puyoPosition = puyoGo.transform.position;
+        var correctPosition = new Vector3((bottomLeft.y + puyoScript.Column * puyoSize.y), bottomLeft.x + puyoScript.Row * puyoSize.x); // todo externalize (used in Init and here)
+        return puyoPosition.x == correctPosition.x && puyoPosition.y == correctPosition.y;
+    }
+
 
     private void InitArray()
     {
@@ -192,6 +222,10 @@ public class PuyoManager : MonoBehaviour {
 
         Destroy(puyos[puyo.Row, puyo.Column]);
         puyos[puyo.Row, puyo.Column] = null;
+
+        // Change the state
+        state = GameState.Repositioning;
+        isBusy = false;
     }
 
     private PuyoColor GetPuyoColorFromString(string str)
