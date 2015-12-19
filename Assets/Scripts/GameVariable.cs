@@ -3,4 +3,6 @@
 	public static int Columns = 6;
 
 	public static int MinimumMatches = 4;
+
+    public static float PuyoRepositioningSpeed = 0.25f;
 }
