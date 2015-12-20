@@ -4,5 +4,5 @@
 
 	public static int MinimumMatches = 4;
 
-    public static float PuyoRepositioningSpeed = 0.25f;
+    public static float PuyoRepositioningSpeed = 0.10f;
 }

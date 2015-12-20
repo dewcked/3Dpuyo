@@ -8,7 +8,7 @@ public class Puyo : MonoBehaviour
 
     public PuyoColor Color { get; set; }
 
-    public void Initialize(int row, int column, PuyoColor color)
+    public void Initialize(PuyoColor color, int row=50, int column=50)
     {
         Row = row;
         Column = column;

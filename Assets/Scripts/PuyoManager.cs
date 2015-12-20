@@ -9,6 +9,8 @@ public class PuyoManager : MonoBehaviour {
 
     readonly GameObject[,] puyos = new GameObject[GameVariable.Rows, GameVariable.Columns];
 
+    private PuyoPair fallingPair;
+
 	GameState gameState;
 
 	Vector2 bottomLeft = new Vector2 (-5f, -4f);
@@ -17,11 +19,11 @@ public class PuyoManager : MonoBehaviour {
 
 	[SerializeField]
 	private GameObject[] puyoPrefabs;
-    
+        
 	void Awake(){
-		InitRandomArray ();
+        InitRandomArray();
 
-        gameState = GameState.CheckAndDestroy;
+        gameState = GameState.Spawning;
 	}
 
     void Update()
@@ -30,7 +32,12 @@ public class PuyoManager : MonoBehaviour {
         {
             case GameState.Busy:
                 break;
+            case GameState.Spawning:
+                SpawnNewPair();
+                gameState = GameState.Falling;
+                break;
             case GameState.Falling:
+                HandleFall();
                 break;
             case GameState.CheckAndDestroy:
                 gameState = GameState.Busy;
@@ -43,6 +50,179 @@ public class PuyoManager : MonoBehaviour {
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private PuyoPair GenerateNewPuyoPair()
+    {
+        var rand1 = Convert.ToInt32(UnityEngine.Random.Range(0, 4));
+
+        var go1 = Instantiate(puyoPrefabs[rand1], new Vector3(10f, 10f), Quaternion.identity) as GameObject;
+        var puyoColor = PuyoHelper.GetPuyoColorFromString(go1.tag);
+        go1.GetComponent<Puyo>().Initialize(puyoColor);
+
+        var rand2 = Convert.ToInt32(UnityEngine.Random.Range(0, 4));
+
+        var go2 = Instantiate(puyoPrefabs[rand2], new Vector3(10f, 10f), Quaternion.identity) as GameObject;
+        var puyoColor2 = PuyoHelper.GetPuyoColorFromString(go2.tag);
+        go2.GetComponent<Puyo>().Initialize(puyoColor2);
+
+        return new PuyoPair(go1, go2);
+    }
+    
+    private Vector3 fallingSpeed = new Vector3(0f, 3f);
+
+    private bool canPairFall()
+    {
+        var p1pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo1.transform.position;
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                if (puyos[i, j] != null)
+                {
+                    var pPos = puyos[i, j].transform.position;
+                    if (pPos.y >= p1pos.y - puyoSize.y || pPos.y >= p2pos.y - puyoSize.y) return false;
+                }
+
+                if (p1pos.y <= -6f || p2pos.y <= -6f) return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool canGoLeft()
+    {
+        var p1pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo1.transform.position;
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                if (puyos[i, j] != null)
+                {
+                    var pPos = puyos[i, j].transform.position;
+                    if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
+                }
+
+                if (p1pos.x <= -4f || p2pos.x <= -4f) return false;
+            }
+        }
+
+        return true;
+    }
+
+    private bool canGoRight()
+    {
+        var p1pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo1.transform.position;
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+        {
+            for (int j = 0; j < GameVariable.Columns; j++)
+            {
+                if (puyos[i, j] != null)
+                {
+                    var pPos = puyos[i, j].transform.position;
+                    if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
+                }
+
+                if (p1pos.x >= 1f || p2pos.x >= 1f) return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void HandleFall()
+    {
+        if (fallingPair == null)
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow) && canGoLeft())
+        {
+            fallingPair.Puyo1.transform.position -= new Vector3(1f, 0f);
+            fallingPair.Puyo2.transform.position -= new Vector3(1f, 0f);   
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightArrow) && canGoRight())
+        {
+            fallingPair.Puyo1.transform.position += new Vector3(1f, 0f);
+            fallingPair.Puyo2.transform.position += new Vector3(1f, 0f);
+        }
+
+        bool canFall = canPairFall();
+        if (canFall)
+        {
+            fallingPair.Puyo1.transform.position -= fallingSpeed*Time.deltaTime;
+            fallingPair.Puyo2.transform.position -= fallingSpeed*Time.deltaTime;
+        }
+        else
+        {
+            FixPair();
+            gameState = GameState.CheckAndDestroy;
+        }
+        
+    }
+
+    private void FixPair()
+    {
+        // todo correct puyo position and add to array and add column and row properties
+
+        // Round Pos
+        var p1pos = fallingPair.Puyo1.transform.position;
+        var roundedP1PosY = (float)Math.Round(p1pos.y);
+        fallingPair.Puyo1.transform.position = new Vector3(p1pos.x, roundedP1PosY);
+
+        var p2pos = fallingPair.Puyo2.transform.position;
+        var roundedP2PosY = (float)Math.Round(p2pos.y);
+        fallingPair.Puyo2.transform.position = new Vector3(p2pos.x, roundedP2PosY);
+
+
+        // Find Column and Row
+        var p1col = getColumnFromXPosition(fallingPair.Puyo1.transform.position.x);
+        var p1row = getRowFromYPosition(fallingPair.Puyo1.transform.position.y);
+
+        var p2col = getColumnFromXPosition(fallingPair.Puyo2.transform.position.x);
+        var p2row = getRowFromYPosition(fallingPair.Puyo2.transform.position.y);
+
+        Debug.Log(string.Format("p1 col : {0}, p1 row : {1}\np2col : {2}, p2row : {3}", p1col, p1row, p2col, p2row));
+
+        // Update array
+        puyos[p1row, p1col] = fallingPair.Puyo1;
+        puyos[p1row, p1col].GetComponent<Puyo>().Column = p1col;
+        puyos[p1row, p1col].GetComponent<Puyo>().Row = p1row;
+
+        puyos[p2row, p2col] = fallingPair.Puyo2;
+        puyos[p2row, p2col].GetComponent<Puyo>().Column = p2col;
+        puyos[p2row, p2col].GetComponent<Puyo>().Row = p2row;
+
+        // ResetFallingPair
+        fallingPair = null;
+    }
+
+    private int getColumnFromXPosition(float x)
+    {
+        var col = x + 4;
+        return (int)col;
+    }
+
+    private int getRowFromYPosition(float y)
+    {
+        var row = y + 5;
+        return (int)row;
+    }
+
+    public void SpawnNewPair()
+    {
+        fallingPair = GenerateNewPuyoPair();
+        fallingPair.Puyo1.transform.position = new Vector3(-2f, 7f);
+        fallingPair.Puyo2.transform.position = new Vector3(-2f, 8f);
     }
 
     public void UpdatePuyosPosition()
@@ -142,12 +322,12 @@ public class PuyoManager : MonoBehaviour {
 
         yield return new WaitForSeconds(biggestRatio * GameVariable.PuyoRepositioningSpeed);
 
-        gameState = GameState.CheckAndDestroy;
+        gameState = GameState.Falling;
     }
     
     private void InitRandomArray()
     {
-        for (int i = 0; i < GameVariable.Rows; i++)
+        for (int i = 0; i < 5; i++)
         {
             for (int j = 0; j < GameVariable.Columns; j++)
             {
@@ -157,7 +337,7 @@ public class PuyoManager : MonoBehaviour {
 
                 var go = Instantiate(puyoPrefabs[rand], position, Quaternion.identity) as GameObject;
                 var puyoColor = PuyoHelper.GetPuyoColorFromString(go.tag);
-                go.GetComponent<Puyo>().Initialize(i, j, puyoColor);
+                go.GetComponent<Puyo>().Initialize(puyoColor, i, j);
 
                 puyos[i, j] = go;
             }
@@ -333,6 +513,7 @@ public class PuyoManager : MonoBehaviour {
 public enum GameState
 {
     Busy,
+    Spawning,
     Falling,
     CheckAndDestroy,
     Repositioning
