@@ -5,4 +5,6 @@
 	public static int MinimumMatches = 4;
 
     public static float PuyoRepositioningSpeed = 0.10f;
+    
+    public static int NumberOfPairToGenerate = 30;
 }

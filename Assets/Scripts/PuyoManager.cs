@@ -17,14 +17,26 @@ public class PuyoManager : MonoBehaviour {
 
 	Vector2 puyoSize = new Vector2(1f, 1f);
 
+    List<PuyoPair> pairs = new List<PuyoPair>();
+
 	[SerializeField]
 	private GameObject[] puyoPrefabs;
         
 	void Awake(){
         InitRandomArray();
 
-        gameState = GameState.Spawning;
+        InitPairs();
+
+        gameState = GameState.CheckAndDestroy;
 	}
+
+    void InitPairs()
+    {
+        for (int i = 0; i < GameVariable.NumberOfPairToGenerate; i++)
+        {
+            pairs.Add(GenerateNewPuyoPair());
+        }
+    }
 
     void Update()
     {
@@ -46,6 +58,9 @@ public class PuyoManager : MonoBehaviour {
             case GameState.Repositioning:
                 gameState = GameState.Busy;
                 UpdatePuyosPosition();
+                break;
+            case GameState.GameOver:
+                Time.timeScale = 0f; // todo
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -80,7 +95,7 @@ public class PuyoManager : MonoBehaviour {
         {
             for (int j = 0; j < GameVariable.Columns; j++)
             {
-                if (puyos[i, j] != null)
+                if (puyos[i, j] != null && j == getColumnFromXPosition(p1pos.x))
                 {
                     var pPos = puyos[i, j].transform.position;
                     if (pPos.y >= p1pos.y - puyoSize.y || pPos.y >= p2pos.y - puyoSize.y) return false;
@@ -102,7 +117,7 @@ public class PuyoManager : MonoBehaviour {
         {
             for (int j = 0; j < GameVariable.Columns; j++)
             {
-                if (puyos[i, j] != null)
+                if (puyos[i, j] != null && (i == getRowFromYPosition(p1pos.y) || i == getRowFromYPosition(p2pos.y) ))
                 {
                     var pPos = puyos[i, j].transform.position;
                     if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
@@ -124,7 +139,7 @@ public class PuyoManager : MonoBehaviour {
         {
             for (int j = 0; j < GameVariable.Columns; j++)
             {
-                if (puyos[i, j] != null)
+                if (puyos[i, j] != null && (i == getRowFromYPosition(p1pos.y) || i == getRowFromYPosition(p2pos.y)))
                 {
                     var pPos = puyos[i, j].transform.position;
                     if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
@@ -220,9 +235,14 @@ public class PuyoManager : MonoBehaviour {
 
     public void SpawnNewPair()
     {
-        fallingPair = GenerateNewPuyoPair();
-        fallingPair.Puyo1.transform.position = new Vector3(-2f, 7f);
-        fallingPair.Puyo2.transform.position = new Vector3(-2f, 8f);
+        if (pairs.Any())
+        {
+            fallingPair = pairs.First();
+            fallingPair.Puyo1.transform.position = new Vector3(-2f, 7f);
+            fallingPair.Puyo2.transform.position = new Vector3(-2f, 8f);
+            
+            pairs.Remove(pairs.First());
+        }
     }
 
     public void UpdatePuyosPosition()
@@ -322,7 +342,7 @@ public class PuyoManager : MonoBehaviour {
 
         yield return new WaitForSeconds(biggestRatio * GameVariable.PuyoRepositioningSpeed);
 
-        gameState = GameState.Falling;
+        gameState = GameState.CheckAndDestroy;
     }
     
     private void InitRandomArray()
@@ -347,13 +367,21 @@ public class PuyoManager : MonoBehaviour {
     private void DestroyAllChains()
     {
         var chains = FindAllChains();
-        foreach (var chain in chains)
+        if (chains.Any())
         {
-            foreach (var puyo in chain.Puyos)
+            foreach (var chain in chains)
             {
-                StartCoroutine(AnimateAndDestroy(puyo));
+                foreach (var puyo in chain.Puyos)
+                {
+                    StartCoroutine(AnimateAndDestroy(puyo));
+                }
             }
         }
+        else
+        {
+            gameState = GameState.Spawning;
+        }
+        
     }
     
     private IEnumerator AnimateAndDestroy(Puyo puyo)
@@ -516,5 +544,6 @@ public enum GameState
     Spawning,
     Falling,
     CheckAndDestroy,
-    Repositioning
+    Repositioning,
+    GameOver
 }
