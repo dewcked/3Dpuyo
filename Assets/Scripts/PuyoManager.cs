@@ -15,7 +15,7 @@ public class PuyoManager : MonoBehaviour {
 
 	Vector2 bottomLeft = new Vector2 (-5f, -4f);
 
-	Vector2 puyoSize = new Vector2(1f, 1f);
+	Vector2 puyoSize = GameVariable.PuyoSize;
 
     List<PuyoPair> pairs = new List<PuyoPair>();
 
@@ -169,6 +169,18 @@ public class PuyoManager : MonoBehaviour {
         {
             fallingPair.Puyo1.transform.position += new Vector3(1f, 0f);
             fallingPair.Puyo2.transform.position += new Vector3(1f, 0f);
+        }
+
+        // todo check canRotate
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            fallingPair.RotateLeft();
+        }
+
+        // todo check canRotate
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            fallingPair.RotateRight();
         }
 
         bool canFall = canPairFall();

@@ -4,3 +4,9 @@
 	Yellow,
 	Green
 }
+
+public enum Orientation
+{
+    Horizontal,
+    Vertical
+}
