@@ -4,9 +4,12 @@ namespace Assets.Scripts
 {
     public static class PuyoHelper
     {
-        public static PuyoColor GetPuyoColorFromString(string str)
+        public static PuyoColor GetPuyoColorFromString(string color)
         {
-            switch (str)
+            if (string.IsNullOrEmpty(color))
+                throw new ArgumentNullException("color");
+
+            switch (color)
             {
                 case "Blue":
                     return PuyoColor.Blue;
@@ -17,7 +20,7 @@ namespace Assets.Scripts
                 case "Red":
                     return PuyoColor.Red;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException("color");
             }
         }
     }

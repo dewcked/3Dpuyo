@@ -84,7 +84,7 @@ public class PuyoManager : MonoBehaviour {
         return new PuyoPair(go1, go2);
     }
     
-    private Vector3 fallingSpeed = new Vector3(0f, 3f);
+    private Vector3 fallingSpeed = new Vector3(0f, 2.5f);
 
     private bool canPairFall()
     {
@@ -111,7 +111,7 @@ public class PuyoManager : MonoBehaviour {
     private bool canGoLeft()
     {
         var p1pos = fallingPair.Puyo1.transform.position;
-        var p2pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo2.transform.position;
 
         for (int i = 0; i < GameVariable.Rows; i++)
         {
@@ -120,10 +120,12 @@ public class PuyoManager : MonoBehaviour {
                 if (puyos[i, j] != null && (i == getRowFromYPosition(p1pos.y) || i == getRowFromYPosition(p2pos.y) ))
                 {
                     var pPos = puyos[i, j].transform.position;
-                    if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
+                    if (p1pos.x - 1 == pPos.x || p2pos.x - 1 == pPos.x)
+						return false;
                 }
-
-                if (p1pos.x <= -4f || p2pos.x <= -4f) return false;
+				
+				if (p1pos.x <= -4f || p2pos.x <= -4f)
+					return false;
             }
         }
 
@@ -133,7 +135,7 @@ public class PuyoManager : MonoBehaviour {
     private bool canGoRight()
     {
         var p1pos = fallingPair.Puyo1.transform.position;
-        var p2pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo2.transform.position;
 
         for (int i = 0; i < GameVariable.Rows; i++)
         {
@@ -142,13 +144,13 @@ public class PuyoManager : MonoBehaviour {
                 if (puyos[i, j] != null && (i == getRowFromYPosition(p1pos.y) || i == getRowFromYPosition(p2pos.y)))
                 {
                     var pPos = puyos[i, j].transform.position;
-                    if (pPos.x <= p1pos.x || pPos.x <= p2pos.x) return false;
+					if (p1pos.x + 1 == pPos.x || p2pos.x + 1 == pPos.x)
+						return false;
                 }
-
-                if (p1pos.x >= 1f || p2pos.x >= 1f) return false;
+				
+				if (p1pos.x >= 1 || p2pos.x >= 1) return false;
             }
         }
-
         return true;
     }
 
@@ -167,7 +169,7 @@ public class PuyoManager : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.RightArrow) && canGoRight())
         {
-            fallingPair.Puyo1.transform.position += new Vector3(1f, 0f);
+			fallingPair.Puyo1.transform.position += new Vector3(1f, 0f);
             fallingPair.Puyo2.transform.position += new Vector3(1f, 0f);
         }
 
@@ -218,7 +220,7 @@ public class PuyoManager : MonoBehaviour {
         var p2col = getColumnFromXPosition(fallingPair.Puyo2.transform.position.x);
         var p2row = getRowFromYPosition(fallingPair.Puyo2.transform.position.y);
 
-        Debug.Log(string.Format("p1 col : {0}, p1 row : {1}\np2col : {2}, p2row : {3}", p1col, p1row, p2col, p2row));
+        //Debug.Log(string.Format("p1 col : {0}, p1 row : {1}\np2col : {2}, p2row : {3}", p1col, p1row, p2col, p2row));
 
         // Update array
         puyos[p1row, p1col] = fallingPair.Puyo1;
@@ -236,13 +238,14 @@ public class PuyoManager : MonoBehaviour {
     private int getColumnFromXPosition(float x)
     {
         var col = x + 4;
-        return (int)col;
+		var value = (int)col;
+        return value;
     }
 
     private int getRowFromYPosition(float y)
     {
         var row = y + 5;
-        return (int)row;
+		return (int)row;
     }
 
     public void SpawnNewPair()
@@ -458,12 +461,12 @@ public class PuyoManager : MonoBehaviour {
         while (nextPuyosToCheck.Any())
         {
             var pi = nextPuyosToCheck.First();
-            var nextInChain = findNextPuyoInChain(pi, currentChain);
+            var nextInChain = FindNextPuyoInChain(pi, currentChain);
             while (nextInChain != null)
             {
                 currentChain.Add(nextInChain);
                 nextPuyosToCheck.Add(nextInChain);
-                nextInChain = findNextPuyoInChain(pi, currentChain);
+                nextInChain = FindNextPuyoInChain(pi, currentChain);
             }
             nextPuyosToCheck.Remove(pi);
         }
@@ -471,7 +474,7 @@ public class PuyoManager : MonoBehaviour {
         return currentChain.Count >= GameVariable.MinimumMatches ? new PuyoGroup(currentChain) : null;
     }
 
-    private Puyo findNextPuyoInChain(Puyo puyo, IEnumerable<Puyo> ignoredPuyos)
+    private Puyo FindNextPuyoInChain(Puyo puyo, IEnumerable<Puyo> ignoredPuyos)
     {
         var ignoredList = ignoredPuyos.ToList();
 
@@ -506,11 +509,11 @@ public class PuyoManager : MonoBehaviour {
             if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
                 return leftPuyo.GetComponent<Puyo>();
         }
-
+        
         // Nothing is found, return null
         return null;
     }
-
+    
     //public bool HasSameColorNeighbor(Puyo puyo)
     //{
     //    return
