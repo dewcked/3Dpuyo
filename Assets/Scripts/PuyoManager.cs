@@ -19,6 +19,8 @@ public class PuyoManager : MonoBehaviour {
 
     List<PuyoPair> pairs = new List<PuyoPair>();
 
+	int combo = 0;
+
 	[SerializeField]
 	private GameObject[] puyoPrefabs;
         
@@ -89,7 +91,7 @@ public class PuyoManager : MonoBehaviour {
     private bool canPairFall()
     {
         var p1pos = fallingPair.Puyo1.transform.position;
-        var p2pos = fallingPair.Puyo1.transform.position;
+        var p2pos = fallingPair.Puyo2.transform.position;
 
         for (int i = 0; i < GameVariable.Rows; i++)
         {
@@ -101,7 +103,7 @@ public class PuyoManager : MonoBehaviour {
                     if (pPos.y >= p1pos.y - puyoSize.y || pPos.y >= p2pos.y - puyoSize.y) return false;
                 }
 
-                if (p1pos.y <= -6f || p2pos.y <= -6f) return false;
+                if (p1pos.y <= -5f || p2pos.y <= -5f) return false;
             }
         }
 
@@ -174,13 +176,13 @@ public class PuyoManager : MonoBehaviour {
         }
 
         // todo check canRotate
-        if (Input.GetKeyDown(KeyCode.X))
+        if (Input.GetKeyDown(KeyCode.X) && canRotateLeft())
         {
             fallingPair.RotateLeft();
         }
 
         // todo check canRotate
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetKeyDown(KeyCode.C) && canRotateRight())
         {
             fallingPair.RotateRight();
         }
@@ -199,7 +201,17 @@ public class PuyoManager : MonoBehaviour {
         
     }
 
-    private void FixPair()
+	private bool canRotateRight()
+	{
+		throw new NotImplementedException();
+	}
+
+	private bool canRotateLeft()
+	{
+		throw new NotImplementedException();
+	}
+
+	private void FixPair()
     {
         // todo correct puyo position and add to array and add column and row properties
 
