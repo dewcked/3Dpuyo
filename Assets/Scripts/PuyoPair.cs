@@ -1,54 +1,36 @@
 using UnityEngine;
 
+/// <summary>
+/// Puyo pair.
+/// »Ñ¿ä ½Ö.
+/// </summary>
 public class PuyoPair
 {
+    /// <summary>
+    /// First(Base) Puyo.
+    /// Ã¹ ¹øÂ°(±âÁØ) »Ñ¿ä.
+    /// </summary>
     public GameObject Puyo1 { get; set; }
-
+    /// <summary>
+    /// Second Puyo.
+    /// µÎ ¹øÂ° »Ñ¿ä.
+    /// </summary>
     public GameObject Puyo2 { get; set; }
-
+    /// <summary>
+    /// Orientation of Puyo pair.
+    /// »Ñ¿ä ½ÖÀÇ ¹æÇâ.
+    /// </summary>
     public Orientation Orientation { get; set; }
-
+    /// <summary>
+    /// Initializer.
+    /// »ý¼ºÀÚ.
+    /// </summary>
+    /// <param name="puyo1">Ã¹ ¹øÂ° »Ñ¿ä</param>
+    /// <param name="puyo2">µÎ ¹øÂ° »Ñ¿ä</param>
     public PuyoPair(GameObject puyo1, GameObject puyo2)
     {
         Puyo1 = puyo1;
         Puyo2 = puyo2;
         Orientation = Orientation.Vertical;
-    }
-
-    // todo
-    public void RotateRight()
-    {
-        //var oldP1Pos = Puyo1.transform.position;
-        //var oldP2Pos = Puyo2.transform.position;
-        //if (Orientation == Orientation.Vertical)
-        //{
-        //    Puyo1.transform.position = new Vector3(oldP1Pos.x, oldP1Pos.y);
-        //    Puyo2.transform.position = new Vector3(oldP2Pos.x + GameVariable.PuyoSize.x, oldP2Pos.y - GameVariable.PuyoSize.y);
-        //    Orientation = Orientation.Horizontal;
-        //}
-        //else
-        //{
-        //    Puyo1.transform.position = new Vector3(oldP1Pos.x, oldP1Pos.y);
-        //    Puyo2.transform.position = new Vector3(oldP2Pos.x - GameVariable.PuyoSize.x, oldP2Pos.y + GameVariable.PuyoSize.y);
-        //    Orientation = Orientation.Vertical;
-        //}
-    }
-
-    public void RotateLeft()
-    {
-        var oldP1Pos = Puyo1.transform.position;
-        var oldP2Pos = Puyo2.transform.position;
-        if (Orientation == Orientation.Vertical)
-        {
-            Puyo1.transform.position = new Vector3(oldP1Pos.x, oldP1Pos.y);
-            Puyo2.transform.position = new Vector3(oldP2Pos.x - GameVariable.PuyoSize.x, oldP2Pos.y - GameVariable.PuyoSize.y);
-            Orientation = Orientation.Horizontal;
-        }
-        else
-        {
-            Puyo1.transform.position = new Vector3(oldP1Pos.x, oldP1Pos.y);
-            Puyo2.transform.position = new Vector3(oldP2Pos.x + GameVariable.PuyoSize.x, oldP2Pos.y + GameVariable.PuyoSize.y);
-            Orientation = Orientation.Vertical;
-        }
     }
 }
