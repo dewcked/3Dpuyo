@@ -233,7 +233,6 @@ public class PuyoManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            controlBlock(Control.RotateLeftA);
             switch (GameVariable.Scene)
             {
                 case Control.Screen1:
@@ -628,7 +627,7 @@ public class PuyoManager : MonoBehaviour
 
     private Vector3[] canRotate(Control Direction)
     {
-        Vector3[] momentum = { Vector3.zero, Vector3.zero };
+        Vector3[] momentum = { Vector3.zero, Vector3.zero};
         var p1pos = fallingPair.Puyo1.transform.position;
         var p2pos = fallingPair.Puyo2.transform.position;
         var nApad = false;
@@ -669,7 +668,7 @@ public class PuyoManager : MonoBehaviour
                                     bBpad = true;
                             }
                         }
-                        else if (p1pos.z == pPos.z)
+                        if (p1pos.z == pPos.z)
                         {
                             if (Math.Truncate(p1pos.y) == pPos.y)
                             {
@@ -1023,7 +1022,6 @@ public class PuyoManager : MonoBehaviour
                             }
                             else
                             {
-                                Debug.Log("hehe");
                                 momentum[0] += new Vector3(1f, 0f, 0f);
                                 momentum[1] += new Vector3(1f, 0f, 0f);
                             }
