@@ -20,8 +20,7 @@ public class PuyoManager : MonoBehaviour
     List<PuyoPair> pairs = new List<PuyoPair>();
 
     int combo = 0;
-
-    private Control Scene = Control.Screen1;
+    
 
     private float fallingSpeed = 0.3f;
     private float time = 0f;
@@ -57,6 +56,10 @@ public class PuyoManager : MonoBehaviour
         time += Time.deltaTime;
         MoveKeytime += Time.deltaTime;
         DownKeytime += Time.deltaTime;
+        if(pairs.Count >= 2)
+        {
+            ShowNextPuyo();
+        }
         switch (gameState)
         {
             case GameState.Generate:
@@ -130,19 +133,19 @@ public class PuyoManager : MonoBehaviour
         {
             if (pressedA == -1)
             {
-                controlBlock(Control.MoveNegA ^ Scene);
+                controlBlock(Control.MoveNegA ^ GameVariable.Scene);
             }
             else if (pressedA == 1)
             {
-                controlBlock(Control.MovePosA ^ Scene);
+                controlBlock(Control.MovePosA ^ GameVariable.Scene);
             }
             else if (pressedB == -1)
             {
-                controlBlock(Control.MoveNegB ^ Scene);
+                controlBlock(Control.MoveNegB ^ GameVariable.Scene);
             }
             else if (pressedB == 1)
             {
-                controlBlock(Control.MovePosB ^ Scene);
+                controlBlock(Control.MovePosB ^ GameVariable.Scene);
             }
         }
         if (firstMove == true)
@@ -174,19 +177,19 @@ public class PuyoManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            controlBlock(Control.RotateLeftA ^ Scene);
+            controlBlock(Control.RotateLeftA ^ GameVariable.Scene);
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            controlBlock(Control.RotateRightA ^ Scene);
+            controlBlock(Control.RotateRightA ^ GameVariable.Scene);
         }
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            controlBlock(Control.RotateBack ^ Scene);
+            controlBlock(Control.RotateBack ^ GameVariable.Scene);
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            controlBlock(Control.RotateForth ^ Scene);
+            controlBlock(Control.RotateForth ^ GameVariable.Scene);
         }
         else if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -216,6 +219,7 @@ public class PuyoManager : MonoBehaviour
 
         return new PuyoPair(go1, go2);
     }
+
     /// <summary>
     /// Check if can fall
     /// </summary>
@@ -1216,6 +1220,38 @@ public class PuyoManager : MonoBehaviour
 
         pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
         pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
+    }
+
+    private void ShowNextPuyo()
+    {
+        switch (GameVariable.Scene)
+        {
+            case Control.Screen1:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(7.5f, 7f, GameVariable.MidPuyo.z);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(7.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
+                break;
+            case Control.Screen2:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, 7.5f);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 7.5f);
+                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 6.5f);
+                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, 6.5f);
+                break;
+            case Control.Screen3:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(-5.5f, 7f, GameVariable.MidPuyo.z);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(-5.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo1.transform.position = new Vector3(-4.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo2.transform.position = new Vector3(-4.5f, 9f, GameVariable.MidPuyo.z);
+                break;
+            case Control.Screen4:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, -5.5f);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -5.5f);
+                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -4.5f);
+                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, -4.5f);
+                break;
+        }
+        
     }
 
     public void UpdatePuyosPosition()

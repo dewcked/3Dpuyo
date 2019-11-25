@@ -16,7 +16,6 @@ public class LineHolder : MonoBehaviour {
         for (int i = 0; i <= GameVariable.Rows; i++)
             for (int j = 0; j <= GameVariable.ColumnsA; j++)
             {
-                Debug.Log("not that easy");
                 GameObject newline = Instantiate(LineGeneratorPrefab);
                 LineRenderer lRend = newline.GetComponent<LineRenderer>();
 

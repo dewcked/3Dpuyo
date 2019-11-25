@@ -46,5 +46,7 @@ public static class GameVariable {
     /// </summary>
     public static Vector3 PuyoSize = new Vector3(1f, 1f, 1f);
 
+    public static Control Scene = Control.Screen1;
+
     public static Vector3 MidPuyo = new Vector3(GameVariable.ColumnsA / 2 - GameVariable.BasePoint.x, 0f, GameVariable.ColumnsB / 2 - GameVariable.BasePoint.z);
 }
