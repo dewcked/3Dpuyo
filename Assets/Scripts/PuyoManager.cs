@@ -1109,7 +1109,15 @@ public class PuyoManager : MonoBehaviour
     {
         var animationComponent = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].GetComponent<Animation>();
         animationComponent.Play();
-
+        int count = 0;
+        if (count < 3)
+        {
+            puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
+            yield return new WaitForSeconds(0.3f);
+            puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(true);
+            yield return new WaitForSeconds(0.3f);
+            count++;
+        }
         do
         {
             yield return null;
