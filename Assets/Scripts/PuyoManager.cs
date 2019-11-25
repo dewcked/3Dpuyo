@@ -898,8 +898,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -922,8 +922,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -946,8 +946,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -970,8 +970,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -1002,8 +1002,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -1026,8 +1026,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -1050,8 +1050,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -1074,8 +1074,8 @@ public class PuyoManager : MonoBehaviour
                                     return momentum;
                                 else
                                 {
-                                    momentum[0] += new Vector3(0f, 1f, 0f);
-                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    momentum[0] += vpad;
+                                    momentum[1] += new Vector3(0f, -2f, 0f) + vpad;
                                     fallingPair.Orientation = Orientation.VerticalB;
                                     return momentum;
                                 }
@@ -1511,6 +1511,22 @@ public class PuyoManager : MonoBehaviour
             if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
                 return leftPuyo.GetComponent<Puyo>();
         }
+
+        //// Back
+        //if (puyo.ColumnA < GameVariable.ColumnsA - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA + 1)))
+        //{
+        //    var rightPuyo = puyos[puyo.Row, puyo.ColumnA + 1, puyo.ColumnB];
+        //    if (rightPuyo != null && rightPuyo.GetComponent<Puyo>().Color == puyo.Color)
+        //        return rightPuyo.GetComponent<Puyo>();
+        //}
+
+        //// Forth
+        //if (puyo.ColumnA > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA - 1)))
+        //{
+        //    var leftPuyo = puyos[puyo.Row, puyo.ColumnA - 1, puyo.ColumnB];
+        //    if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
+        //        return leftPuyo.GetComponent<Puyo>();
+        //}
 
         // Nothing is found, return null
         return null;
