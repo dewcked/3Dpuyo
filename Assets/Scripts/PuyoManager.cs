@@ -133,19 +133,75 @@ public class PuyoManager : MonoBehaviour
         {
             if (pressedA == -1)
             {
-                controlBlock(Control.MoveNegA ^ GameVariable.Scene);
+                switch (GameVariable.Scene)
+                {
+                    case Control.Screen1:
+                        controlBlock(Control.MoveNegA);
+                        break;
+                    case Control.Screen2:
+                        controlBlock(Control.MoveNegB);
+                        break;
+                    case Control.Screen3:
+                        controlBlock(Control.MovePosA);
+                        break;
+                    case Control.Screen4:
+                        controlBlock(Control.MovePosB);
+                        break;
+                }
             }
             else if (pressedA == 1)
             {
-                controlBlock(Control.MovePosA ^ GameVariable.Scene);
-            }
-            else if (pressedB == -1)
-            {
-                controlBlock(Control.MoveNegB ^ GameVariable.Scene);
+                switch (GameVariable.Scene)
+                {
+                    case Control.Screen1:
+                        controlBlock(Control.MovePosA);
+                        break;
+                    case Control.Screen2:
+                        controlBlock(Control.MovePosB);
+                        break;
+                    case Control.Screen3:
+                        controlBlock(Control.MoveNegA);
+                        break;
+                    case Control.Screen4:
+                        controlBlock(Control.MoveNegB);
+                        break;
+                }
             }
             else if (pressedB == 1)
             {
-                controlBlock(Control.MovePosB ^ GameVariable.Scene);
+                switch (GameVariable.Scene)
+                {
+                    case Control.Screen1:
+                        controlBlock(Control.MovePosB);
+                        break;
+                    case Control.Screen2:
+                        controlBlock(Control.MoveNegA);
+                        break;
+                    case Control.Screen3:
+                        controlBlock(Control.MoveNegB);
+                        break;
+                    case Control.Screen4:
+                        controlBlock(Control.MovePosA);
+                        break;
+                }
+            }
+            else if (pressedB == -1)
+            {
+                switch (GameVariable.Scene)
+                {
+                    case Control.Screen1:
+                        controlBlock(Control.MoveNegB);
+                        break;
+                    case Control.Screen2:
+                        controlBlock(Control.MovePosA);
+                        break;
+                    case Control.Screen3:
+                        controlBlock(Control.MovePosB);
+                        break;
+                    case Control.Screen4:
+                        controlBlock(Control.MoveNegA);
+                        break;
+                }
             }
         }
         if (firstMove == true)
@@ -177,19 +233,76 @@ public class PuyoManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.A))
         {
-            controlBlock(Control.RotateLeftA ^ GameVariable.Scene);
+            controlBlock(Control.RotateLeftA);
+            switch (GameVariable.Scene)
+            {
+                case Control.Screen1:
+                    controlBlock(Control.RotateLeftA);
+                    break;
+                case Control.Screen2:
+                    controlBlock(Control.RotateBack);
+                    break;
+                case Control.Screen3:
+                    controlBlock(Control.RotateRightA);
+                    break;
+                case Control.Screen4:
+                    controlBlock(Control.RotateForth);
+                    break;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.D))
         {
-            controlBlock(Control.RotateRightA ^ GameVariable.Scene);
+            switch (GameVariable.Scene)
+            {
+                case Control.Screen1:
+                    controlBlock(Control.RotateRightA);
+                    break;
+                case Control.Screen2:
+                    controlBlock(Control.RotateBack);
+                    break;
+                case Control.Screen3:
+                    controlBlock(Control.RotateLeftA);
+                    break;
+                case Control.Screen4:
+                    controlBlock(Control.RotateForth);
+                    break;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.W))
         {
-            controlBlock(Control.RotateBack ^ GameVariable.Scene);
+            switch (GameVariable.Scene)
+            {
+                case Control.Screen1:
+                    controlBlock(Control.RotateBack);
+                    break;
+                case Control.Screen2:
+                    controlBlock(Control.RotateLeftA);
+                    break;
+                case Control.Screen3:
+                    controlBlock(Control.RotateForth);
+                    break;
+                case Control.Screen4:
+                    controlBlock(Control.RotateRightA);
+                    break;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.S))
         {
-            controlBlock(Control.RotateForth ^ GameVariable.Scene);
+            switch (GameVariable.Scene)
+            {
+                case Control.Screen1:
+                    controlBlock(Control.RotateForth);
+                    break;
+                case Control.Screen2:
+                    controlBlock(Control.RotateRightA);
+                    break;
+                case Control.Screen3:
+                    controlBlock(Control.RotateBack);
+                    break;
+                case Control.Screen4:
+                    controlBlock(Control.RotateLeftA);
+                    break;
+            }
         }
         else if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -910,6 +1023,7 @@ public class PuyoManager : MonoBehaviour
                             }
                             else
                             {
+                                Debug.Log("hehe");
                                 momentum[0] += new Vector3(1f, 0f, 0f);
                                 momentum[1] += new Vector3(1f, 0f, 0f);
                             }

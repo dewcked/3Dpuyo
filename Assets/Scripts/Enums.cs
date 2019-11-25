@@ -30,9 +30,9 @@ public enum Orientation
 public enum Control
 {
     MovePosA = 0,
-    MoveNegB = 1,
+    MovePosB = 1,
     MoveNegA = 2,
-    MovePosB = 3,
+    MoveNegB = 3,
     RotateRightA = 4,
     RotateBack = 5,
     RotateLeftA = 6,
