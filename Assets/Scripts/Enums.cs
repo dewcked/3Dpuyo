@@ -15,25 +15,36 @@ public enum PuyoColor {
 /// </summary>
 public enum Orientation
 {
-    HorizontalA,
-    HorizontalB,
-    Vertical
+    PosA,
+    NegA,
+    PosB,
+    NegB,
+    VerticalA,
+    VerticalB
 }
 
 /// <summary>
 /// Control of Puyo.
-/// 뿌요 컨트롤.
+/// 뿌요 컨트롤. Screen은 오른쪽으로 회전하면 1씩 증가
 /// </summary>
 public enum Control
 {
-    Fall,
-    Left,
-    Right,
+    MovePosA = 0,
+    MoveNegB = 1,
+    MoveNegA = 2,
+    MovePosB = 3,
+    RotateRightA = 4,
+    RotateBack = 5,
+    RotateLeftA = 6,
+    RotateForth = 7,
     Drop,
-    Back,
-    Forth,
-    RotateLeft,
-    RotateRight
+    Fall,
+    RotateHorizontalLeft,
+    RotateHorizontalRight,
+    Screen1 = 0,
+    Screen2 = 1,
+    Screen3 = 2,
+    Screen4 = 3
 }
 /// <summary>
 /// 게임상태

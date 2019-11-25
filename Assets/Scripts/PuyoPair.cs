@@ -31,6 +31,6 @@ public class PuyoPair
     {
         Puyo1 = puyo1;
         Puyo2 = puyo2;
-        Orientation = Orientation.Vertical;
+        Orientation = Orientation.VerticalA;
     }
 }

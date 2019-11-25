@@ -39,10 +39,12 @@ public static class GameVariable {
     /// Base point of game screen.
     /// 게임 화면외 왼쪽 아래 기준점.
     /// </summary>
-    public static Vector2 BasePoint = new Vector3(0f, 0f, 0f);
+    public static Vector3 BasePoint = new Vector3(0f, 0f, 0f);
     /// <summary>
     /// Size of Puyo.
     /// 뿌요의 가로 세로 크기.
     /// </summary>
-    public static Vector2 PuyoSize = new Vector3(1f, 1f, 1f);
+    public static Vector3 PuyoSize = new Vector3(1f, 1f, 1f);
+
+    public static Vector3 MidPuyo = new Vector3(GameVariable.ColumnsA / 2 - GameVariable.BasePoint.x, 0f, GameVariable.ColumnsB / 2 - GameVariable.BasePoint.z);
 }
