@@ -250,7 +250,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9384866a156e3c4bbb0a33af48de4a2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LineGeneratorPrefab: {fileID: 0}
+  LineGeneratorPrefab: {fileID: 1928691352}
 --- !u!4 &1622614712
 Transform:
   m_ObjectHideFlags: 0
