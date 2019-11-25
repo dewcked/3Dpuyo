@@ -28,7 +28,6 @@ public class PuyoManager : MonoBehaviour
     private float MoveKeytime = 0f;
     private float DownKeytime = 0.02f;
     private float RotateKeytime = 0.08f;
-    private bool DoubleRotationChk = false;
 
     private float MoveKeySpeed = 0.05f;
     private float DownKeySpeed = 0.02f;
@@ -39,7 +38,8 @@ public class PuyoManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] puyoPrefabs;
-    private bool firstMove;
+    private bool firstMove = true;
+    private bool firstRotate = true;
 
     void Awake()
     {
@@ -382,6 +382,7 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += new Vector3(1f, 0f, 0f);
                     Sound1.clip = Resources.Load<AudioClip>("movePuyo");
                     Sound1.Play();
+                    firstRotate = true;
                 }
                 break;
             case Control.MoveNegA:
@@ -391,6 +392,7 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position -= new Vector3(1f, 0f, 0f);
                     Sound1.clip = Resources.Load<AudioClip>("movePuyo");
                     Sound1.Play();
+                    firstRotate = true;
                 }
                 break;
             case Control.MovePosB:
@@ -400,6 +402,7 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += new Vector3(0f, 0f, 1f);
                     Sound1.clip = Resources.Load<AudioClip>("movePuyo");
                     Sound1.Play();
+                    firstRotate = true;
                 }
                 break;
             case Control.MoveNegB:
@@ -409,6 +412,7 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position -= new Vector3(0f, 0f, 1f);
                     Sound1.clip = Resources.Load<AudioClip>("movePuyo");
                     Sound1.Play();
+                    firstRotate = true;
                 }
                 break;
             case Control.RotateRightA:
@@ -419,6 +423,11 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
             case Control.RotateLeftA:
@@ -429,6 +438,11 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
             case Control.RotateBack:
@@ -439,6 +453,11 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
             case Control.RotateForth:
@@ -449,26 +468,41 @@ public class PuyoManager : MonoBehaviour
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
             case Control.RotateHorizontalRight:
                 changeVector = canRotate(Control.RotateHorizontalRight);
-                if (changeVector != null)
+                if (!changeVector[0].Equals(Vector3.zero) || !changeVector[1].Equals(Vector3.zero))
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
             case Control.RotateHorizontalLeft:
                 changeVector = canRotate(Control.RotateHorizontalLeft);
-                if (changeVector != null)
+                if (!changeVector[0].Equals(Vector3.zero) || !changeVector[1].Equals(Vector3.zero))
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
                     Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
                     Sound2.Play();
+                    firstRotate = true;
+                }
+                else
+                {
+                    firstRotate = false;
                 }
                 break;
         }
@@ -482,23 +516,54 @@ public class PuyoManager : MonoBehaviour
         var p2pos = fallingPair.Puyo2.transform.position;
         var nApad = false;
         var pApad = false;
-        var nBpad = false;
-        var pBpad = false;
+        var bBpad = false;
+        var fBpad = false;
         Vector3 vpad = Vector3.zero;
 
-        // padding 추가
-        // isFirstKey 체크
+        if (p1pos.x == GameVariable.BasePoint.x)
+            nApad = true;
+        else if (p1pos.x == GameVariable.BasePoint.x + GameVariable.ColumnsA - 1)
+            pApad = true;
 
-        //for (int i = 0; i < GameVariable.Rows; i++)
-        //    for (int j = 0; j < GameVariable.ColumnsA; j++)
-        //        for (int k = 0; k < GameVariable.ColumnsB; k++)
-        //            if (puyos[i, j, k] != null)
-        //            {
-        //                var pPos = puyos[i, j, k].transform.position;
+        if (p1pos.z == GameVariable.BasePoint.z)
+            fBpad = true;
+        else if (p1pos.z == GameVariable.BasePoint.z + GameVariable.ColumnsB - 1)
+            bBpad = true;
 
-        //                if (pPos.x == p1pos.x && pPos.y == (float)Math.Truncate(p1pos.y) - 1)
-        //                    vpad = new Vector3(0, 1 - (p1pos.y - (float)Math.Truncate(p1pos.y)));
-        //            }
+        if (Math.Truncate(p1pos.y) == GameVariable.BasePoint.y)
+            vpad = new Vector3(0, 1 - (p1pos.y - (float)Math.Truncate(p1pos.y)));
+
+        for (int i = 0; i < GameVariable.Rows; i++)
+            for (int j = 0; j < GameVariable.ColumnsA; j++)
+                for (int k = 0; k < GameVariable.ColumnsB; k++)
+                    if (puyos[i, j, k] != null)
+                    {
+                        var pPos = puyos[i, j, k].transform.position;
+
+                        if (p1pos.x == pPos.x)
+                        {
+                            if (p1pos.z == pPos.z && Math.Truncate(p1pos.y) - 1 == pPos.y)
+                                vpad = new Vector3(0, 1 - (p1pos.y - (float)Math.Truncate(p1pos.y)));
+                            else if (Math.Truncate(p1pos.y) == pPos.y)
+                            {
+                                if (p1pos.z - 1 == pPos.z)
+                                    fBpad = true;
+                                else if (p1pos.z + 1 == pPos.z)
+                                    bBpad = true;
+                            }
+                        }
+                        else if(p1pos.z == pPos.z)
+                        {
+                            if(Math.Truncate(p1pos.y) == pPos.y)
+                            {
+                                if (p1pos.x - 1 == pPos.x)
+                                    nApad = true;
+                                else if (p1pos.x + 1 == pPos.x)
+                                    pApad = true;
+                            }
+                        }
+                        
+                    }
 
         switch (fallingPair.Orientation)
         {
@@ -518,17 +583,64 @@ public class PuyoManager : MonoBehaviour
                         fallingPair.Orientation = Orientation.VerticalA;
                         return momentum;
                     case Control.RotateHorizontalLeft:
-                        // side pad
-                        //if (pBpad)
-                        //{
-                        //    momentum[0] += new Vector3(0f, 0f, 1f);
-                        //    momentum[1] += new Vector3(0f, 0f, 1f);
-                        //}
+                        if (bBpad)
+                        {
+                            if (fBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (pApad)
+                                    {
+                                        momentum[0] += new Vector3(1f, 0f, 0f);
+                                        momentum[1] += new Vector3(-1f, 0f, 0f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(2f, 0f, 0f);
+                                    }
+                                    fallingPair.Orientation = Orientation.PosA;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, -1f);
+                                momentum[1] += new Vector3(0f, 0f, -1f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, 0f, 1f);
                         fallingPair.Orientation = Orientation.PosB;
                         return momentum;
                     case Control.RotateHorizontalRight:
-                        // side pad
+                        if (fBpad)
+                        {
+                            if (bBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (pApad)
+                                    {
+                                        momentum[0] += new Vector3(1f, 0f, 0f);
+                                        momentum[1] += new Vector3(-1f, 0f, 0f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(2f, 0f, 0f);
+                                    }
+                                    fallingPair.Orientation = Orientation.PosA;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, 1f);
+                                momentum[1] += new Vector3(0f, 0f, 1f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, 0f, -1f);
                         fallingPair.Orientation = Orientation.NegB;
                         return momentum;
@@ -550,12 +662,64 @@ public class PuyoManager : MonoBehaviour
                         fallingPair.Orientation = Orientation.VerticalB;
                         return momentum;
                     case Control.RotateHorizontalLeft:
-                        // side pad
+                        if (fBpad)
+                        {
+                            if (bBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (nApad)
+                                    {
+                                        momentum[0] += new Vector3(-1f, 0f, 0f);
+                                        momentum[1] += new Vector3(1f, 0f, 0f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(-2f, 0f, 0f);
+                                    }
+                                    fallingPair.Orientation = Orientation.NegA;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, 1f);
+                                momentum[1] += new Vector3(0f, 0f, 1f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, 0f, -1f);
                         fallingPair.Orientation = Orientation.NegB;
                         return momentum;
                     case Control.RotateHorizontalRight:
-                        // side pad
+                        if (bBpad)
+                        {
+                            if (fBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (nApad)
+                                    {
+                                        momentum[0] += new Vector3(-1f, 0f, 0f);
+                                        momentum[1] += new Vector3(1f, 0f, 0f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(-2f, 0f, 0f);
+                                    }
+                                    fallingPair.Orientation = Orientation.PosA;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, -1f);
+                                momentum[1] += new Vector3(0f, 0f, -1f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, 0f, 1f);
                         fallingPair.Orientation = Orientation.PosB;
                         return momentum;
@@ -568,8 +732,8 @@ public class PuyoManager : MonoBehaviour
                     case Control.RotateRightA:
                         return momentum;
                     case Control.RotateForth:
-                        //bottom pad
-                        momentum[1] += new Vector3(0f, -1f, 1f);
+                        momentum[0] += vpad;
+                        momentum[1] += new Vector3(0f, -1f, 1f) + vpad;
                         fallingPair.Orientation = Orientation.VerticalB;
                         return momentum;
                     case Control.RotateBack:
@@ -577,12 +741,64 @@ public class PuyoManager : MonoBehaviour
                         fallingPair.Orientation = Orientation.VerticalA;
                         return momentum;
                     case Control.RotateHorizontalLeft:
-                        // side pad
+                        if (nApad)
+                        {
+                            if (pApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (bBpad)
+                                    {
+                                        momentum[0] += new Vector3(0f, 0f, 1f);
+                                        momentum[1] += new Vector3(0f, 0f, -1f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(0f, 0f, -2f);
+                                    }
+                                    fallingPair.Orientation = Orientation.PosB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(1f, 0f, 0f);
+                                momentum[1] += new Vector3(1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, 0f, 1f);
                         fallingPair.Orientation = Orientation.NegA;
                         return momentum;
                     case Control.RotateHorizontalRight:
-                        // side pad
+                        if (pApad)
+                        {
+                            if (nApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (bBpad)
+                                    {
+                                        momentum[0] += new Vector3(0f, 0f, 1f);
+                                        momentum[1] += new Vector3(0f, 0f, -1f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(0f, 0f, -2f);
+                                    }
+                                    fallingPair.Orientation = Orientation.PosB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(-1f, 0f, 0f);
+                                momentum[1] += new Vector3(-1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, 0f, 1f);
                         fallingPair.Orientation = Orientation.PosA;
                         return momentum;
@@ -599,17 +815,69 @@ public class PuyoManager : MonoBehaviour
                         fallingPair.Orientation = Orientation.VerticalA;
                         return momentum;
                     case Control.RotateBack:
-                        //bottom pad
-                        momentum[1] += new Vector3(0f, -1f, -1f);
+                        momentum[0] += vpad;
+                        momentum[1] += new Vector3(0f, -1f, -1f) + vpad;
                         fallingPair.Orientation = Orientation.VerticalB;
                         return momentum;
                     case Control.RotateHorizontalLeft:
-                        // side pad
+                        if (pApad)
+                        {
+                            if (nApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (fBpad)
+                                    {
+                                        momentum[0] += new Vector3(0f, 0f, -1f);
+                                        momentum[1] += new Vector3(0f, 0f, 1f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(0f, 0f, -2f);
+                                    }
+                                    fallingPair.Orientation = Orientation.NegB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(-1f, 0f, 0f);
+                                momentum[1] += new Vector3(-1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, 0f, -1f);
                         fallingPair.Orientation = Orientation.PosA;
                         return momentum;
                     case Control.RotateHorizontalRight:
-                        // side pad
+                        if (nApad)
+                        {
+                            if (pApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    if (fBpad)
+                                    {
+                                        momentum[0] += new Vector3(0f, 0f, -1f);
+                                        momentum[1] += new Vector3(0f, 0f, 1f);
+                                    }
+                                    else
+                                    {
+                                        momentum[1] += new Vector3(0f, 0f, -2f);
+                                    }
+                                    fallingPair.Orientation = Orientation.NegB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(1f, 0f, 0f);
+                                momentum[1] += new Vector3(1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, 0f, -1f);
                         fallingPair.Orientation = Orientation.NegA;
                         return momentum;
@@ -622,22 +890,98 @@ public class PuyoManager : MonoBehaviour
                     case Control.RotateHorizontalRight:
                         return momentum;
                     case Control.RotateLeftA:
-                        // negApad && posApad
+                        if (nApad)
+                        {
+                            if (pApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(1f, 0f, 0f);
+                                momentum[1] += new Vector3(1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, -1f, 0f);
                         fallingPair.Orientation = Orientation.NegA;
                         return momentum;
                     case Control.RotateRightA:
-                        // posApad && negApad
+                        if (pApad)
+                        {
+                            if (nApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(-1f, 0f, 0f);
+                                momentum[1] += new Vector3(-1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, -1f, 0f);
                         fallingPair.Orientation = Orientation.PosA;
                         return momentum;
                     case Control.RotateForth:
-                        // negBpad && posBpad
+                        if (fBpad)
+                        {
+                            if (bBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, 1f);
+                                momentum[1] += new Vector3(0f, 0f, 1f);
+                            }
+                        }
                         momentum[1] += new Vector3(0f, -1f, -1f);
                         fallingPair.Orientation = Orientation.NegB;
                         return momentum;
                     case Control.RotateBack:
-                        // posBpad && negBpad
+                        if (bBpad)
+                        {
+                            if (fBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, -1f);
+                                momentum[1] += new Vector3(0f, 0f, -1f);
+                            }
+                        }
                         momentum[1] += new Vector3(0f, -1f, 1f);
                         fallingPair.Orientation = Orientation.PosB;
                         return momentum;
@@ -650,156 +994,105 @@ public class PuyoManager : MonoBehaviour
                     case Control.RotateHorizontalRight:
                         return momentum;
                     case Control.RotateLeftA:
-                        // posApad && negApad
+                        if (pApad)
+                        {
+                            if (nApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(-1f, 0f, 0f);
+                                momentum[1] += new Vector3(-1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(1f, 1f, 0f);
                         fallingPair.Orientation = Orientation.PosA;
                         return momentum;
                     case Control.RotateRightA:
-                        // negApad && posApad
+                        if (nApad)
+                        {
+                            if (pApad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(1f, 0f, 0f);
+                                momentum[1] += new Vector3(1f, 0f, 0f);
+                            }
+                        }
                         momentum[1] += new Vector3(-1f, 1f, 0f);
                         fallingPair.Orientation = Orientation.NegA;
                         return momentum;
                     case Control.RotateForth:
-                        // posBpad && negBpad
+                        if (bBpad)
+                        {
+                            if (fBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, -1f);
+                                momentum[1] += new Vector3(0f, 0f, -1f);
+                            }
+                        }
                         momentum[1] += new Vector3(0f, 1f, 1f);
                         fallingPair.Orientation = Orientation.PosB;
                         return momentum;
                     case Control.RotateBack:
-                        // negBpad && posBpad
+                        if (fBpad)
+                        {
+                            if (bBpad)
+                            {
+                                if (firstRotate == true)
+                                    return momentum;
+                                else
+                                {
+                                    momentum[0] += new Vector3(0f, 1f, 0f);
+                                    momentum[1] += new Vector3(0f, -1f, 0f);
+                                    fallingPair.Orientation = Orientation.VerticalB;
+                                    return momentum;
+                                }
+                            }
+                            else
+                            {
+                                momentum[0] += new Vector3(0f, 0f, 1f);
+                                momentum[1] += new Vector3(0f, 0f, 1f);
+                            }
+                        }
                         momentum[1] += new Vector3(0f, 1f, -1f);
                         fallingPair.Orientation = Orientation.NegB;
                         return momentum;
                 }
                 break;
         }
-
-
-
-        if (fallingPair.Orientation == Orientation.PosA)
-        {
-            if (Math.Truncate(p1pos.y) == GameVariable.BasePoint.y)
-                vpad = new Vector3(0f, 1 - (p1pos.y - GameVariable.BasePoint.y));
-            else
-            {
-                for (int i = 0; i < GameVariable.Rows; i++)
-                {
-                    for (int j = 0; j < GameVariable.ColumnsA; j++)
-                    {
-                        for (int k = 0; k < GameVariable.ColumnsB; k++)
-                        {
-                            if (puyos[i, j, k] != null)
-                            {
-                                var pPos = puyos[i, j, k].transform.position;
-
-                                if (pPos.x == p1pos.x && pPos.y == (float)Math.Truncate(p1pos.y) - 1)
-                                    vpad = new Vector3(0, 1 - (p1pos.y - (float)Math.Truncate(p1pos.y)));
-                            }
-                        }
-                    }
-                }
-            }
-            if (p1pos.x > p2pos.x)
-                momentum[1] = new Vector3(1f, 1f);
-            else
-            {
-                //Debug.Log(fallingPair.Puyo1.transform.position.y + " " + fallingPair.Puyo2.transform.position.y + " " + bpad.y + "s");
-                momentum[0] = new Vector3(0f, vpad.y);
-                momentum[1] = new Vector3(-1f, -1f + vpad.y);
-                //Debug.Log(fallingPair.Puyo1.transform.position.y + " " + fallingPair.Puyo2.transform.position.y + " " + bpad.y + "e");
-            }
-            fallingPair.Orientation = Orientation.VerticalA;
-            DoubleRotationChk = false;
-            return momentum;
-        }
-        else
-        {
-            if (Math.Truncate(p1pos.y) == GameVariable.BasePoint.y)
-                vpad = new Vector3(0f, 1 - (p1pos.y - GameVariable.BasePoint.y));
-            if (p1pos.x == GameVariable.BasePoint.x)
-                nApad = true;
-            else if (p1pos.x == GameVariable.BasePoint.x + GameVariable.ColumnsA - 1)
-                pApad = true;
-            for (int i = 0; i < GameVariable.Rows; i++)
-            {
-                for (int j = 0; j < GameVariable.ColumnsA; j++)
-                {
-                    for (int k = 0; k < GameVariable.ColumnsB; k++)
-                    {
-                        if (puyos[i, j, k] != null)
-                        {
-                            var pPos = puyos[i, j, k].transform.position;
-
-                            if (p1pos.x - 1 == pPos.x && (float)Math.Truncate(p1pos.y) == pPos.y)
-                            {
-                                nApad = true;
-                            }
-                            else if (p1pos.x + 1 == pPos.x && (float)Math.Truncate(p1pos.y) == pPos.y)
-                            {
-                                pApad = true;
-                            }
-                            else if (p1pos.x == pPos.x && (float)Math.Truncate(p1pos.y) - 1 == pPos.y)
-                            {
-                                vpad = new Vector3(0, 1 - (p1pos.y - (float)Math.Truncate(p1pos.y)));
-                            }
-                        }
-                    }
-                }
-            }
-            if (nApad == true && pApad == true)
-            {
-                if (DoubleRotationChk == false)
-                {
-                    DoubleRotationChk = true;
-                    return momentum;
-                }
-                else
-                {
-                    DoubleRotationChk = false;
-                    if (p1pos.y > p2pos.y)
-                        momentum[1] = new Vector3(0f, 2f);
-                    else
-                    {
-                        momentum[0] = new Vector3(0f, vpad.y);
-                        momentum[1] = new Vector3(0f, vpad.y - 2f);
-                    }
-                    fallingPair.Orientation = Orientation.VerticalA;
-                    return momentum;
-                }
-            }
-            else if (nApad == false && pApad == false)
-            {
-                if (p1pos.y > p2pos.y)
-                    momentum[1] = new Vector3(-1f, 1f);
-                else
-                    momentum[1] = new Vector3(1f, -1f);
-            }
-            else if (nApad == true && pApad == false)
-            {
-                if (p1pos.y > p2pos.y)
-                {
-                    momentum[0] = new Vector3(1f, 0f);
-                    momentum[1] = new Vector3(0f, 1f);
-                }
-                else
-                {
-                    momentum[1] = new Vector3(1f, -1f);
-                }
-            }
-            else if (nApad == false && pApad == true)
-            {
-                if (p1pos.y > p2pos.y)
-                {
-                    momentum[1] = new Vector3(-1f, 1f);
-                }
-                else
-                {
-                    momentum[0] = new Vector3(-1f, 0f);
-                    momentum[1] = new Vector3(0f, -1f);
-                }
-            }
-            fallingPair.Orientation = Orientation.PosA;
-            return momentum;
-        }
+        return momentum;
     }
 
     private IEnumerator FixPair()
