@@ -237,10 +237,10 @@ public class PuyoManager : MonoBehaviour
                         var pPos = puyos[i, j, k].transform.position;
                         if (pPos.x == p1pos.x && pPos.z == p1pos.z
                             && (pPos.y == Math.Ceiling(p1pos.y) - 1 || pPos.y == Math.Ceiling(p2pos.y) - 1))
-                                return false;
+                            return false;
                         if (pPos.x == p2pos.x && pPos.z == p2pos.z
                             && (pPos.y == Math.Ceiling(p1pos.y) - 1 || pPos.y == Math.Ceiling(p2pos.y) - 1))
-                                return false;
+                            return false;
                     }
         return true;
     }
@@ -552,9 +552,9 @@ public class PuyoManager : MonoBehaviour
                                     bBpad = true;
                             }
                         }
-                        else if(p1pos.z == pPos.z)
+                        else if (p1pos.z == pPos.z)
                         {
-                            if(Math.Truncate(p1pos.y) == pPos.y)
+                            if (Math.Truncate(p1pos.y) == pPos.y)
                             {
                                 if (p1pos.x - 1 == pPos.x)
                                     nApad = true;
@@ -562,7 +562,7 @@ public class PuyoManager : MonoBehaviour
                                     pApad = true;
                             }
                         }
-                        
+
                     }
 
         switch (fallingPair.Orientation)
@@ -1520,21 +1520,21 @@ public class PuyoManager : MonoBehaviour
                 return leftPuyo.GetComponent<Puyo>();
         }
 
-        //// Back
-        //if (puyo.ColumnA < GameVariable.ColumnsA - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA + 1)))
-        //{
-        //    var rightPuyo = puyos[puyo.Row, puyo.ColumnA + 1, puyo.ColumnB];
-        //    if (rightPuyo != null && rightPuyo.GetComponent<Puyo>().Color == puyo.Color)
-        //        return rightPuyo.GetComponent<Puyo>();
-        //}
+        // Back
+        if (puyo.ColumnB < GameVariable.ColumnsB - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnB == puyo.ColumnB + 1)))
+        {
+            var rightPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB + 1];
+            if (rightPuyo != null && rightPuyo.GetComponent<Puyo>().Color == puyo.Color)
+                return rightPuyo.GetComponent<Puyo>();
+        }
 
-        //// Forth
-        //if (puyo.ColumnA > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA - 1)))
-        //{
-        //    var leftPuyo = puyos[puyo.Row, puyo.ColumnA - 1, puyo.ColumnB];
-        //    if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
-        //        return leftPuyo.GetComponent<Puyo>();
-        //}
+        // Forth
+        if (puyo.ColumnB > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnB == puyo.ColumnB - 1)))
+        {
+            var leftPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB - 1];
+            if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
+                return leftPuyo.GetComponent<Puyo>();
+        }
 
         // Nothing is found, return null
         return null;
