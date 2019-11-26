@@ -1302,7 +1302,7 @@ public class PuyoManager : MonoBehaviour
                     if (puyo != null)
                     {
                         var oldPosition = puyo.transform.position;
-                        var newPosition = FindPuyoScreenPosition(i, j);
+                        var newPosition = FindPuyoScreenPosition(i, j, k);
 
                         // Position is correct, skip and continue with the next puyo
                         if (oldPosition.y == newPosition.y) continue;
@@ -1432,9 +1432,9 @@ public class PuyoManager : MonoBehaviour
         }
     }
 
-    private Vector3 FindPuyoScreenPosition(int row, int column)
+    private Vector3 FindPuyoScreenPosition(int row, int columnA, int columnB)
     {
-        return new Vector3((GameVariable.BasePoint.y + column * GameVariable.PuyoSize.y), GameVariable.BasePoint.x + row * GameVariable.PuyoSize.x);
+        return new Vector3(GameVariable.BasePoint.x + columnA * GameVariable.PuyoSize.y, GameVariable.BasePoint.y + row * GameVariable.PuyoSize.y, GameVariable.BasePoint.z + columnB * GameVariable.PuyoSize.z);
     }
 
     /// <summary>
@@ -1456,7 +1456,7 @@ public class PuyoManager : MonoBehaviour
                     if (puyo != null)
                     {
                         var oldPosition = puyo.transform.position;
-                        var newPosition = FindPuyoScreenPosition(i, j);
+                        var newPosition = FindPuyoScreenPosition(i, j, k);
 
                         // Position is correct, skip and continue with the next puyo
                         if (oldPosition.y == newPosition.y) continue;
@@ -1485,10 +1485,10 @@ public class PuyoManager : MonoBehaviour
                 {
                     var rand = Convert.ToInt32(UnityEngine.Random.Range(0, 4));
 
-                    var position = FindPuyoScreenPosition(i, j);
+                    var position = FindPuyoScreenPosition(i, j, k);
                     var go = Instantiate(puyoPrefabs[rand], position, Quaternion.identity) as GameObject;
                     var puyoColor = PuyoHelper.GetPuyoColorFromString(go.tag);
-                    go.GetComponent<Puyo>().Initialize(puyoColor, i, j);
+                    go.GetComponent<Puyo>().Initialize(puyoColor, i, j, k);
 
                     puyos[i, j, k] = go;
                 }
