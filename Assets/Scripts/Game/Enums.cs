@@ -59,3 +59,11 @@ public enum GameState
     GameOver,
     Generate
 }
+
+public enum FX
+{
+    BGM,
+    Move,
+    Rotate,
+    Combo
+}

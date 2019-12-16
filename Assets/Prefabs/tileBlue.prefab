@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 33489507658273640}
   - component: {fileID: 23535039420420964}
   - component: {fileID: 114688806156832798}
-  - component: {fileID: 111571702140813640}
   m_Layer: 0
   m_Name: tileBlue
   m_TagString: Blue
@@ -86,21 +85,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1063291227705184}
   m_Mesh: {fileID: 4300000, guid: adaded5248d30314cb4e49982bf22927, type: 3}
---- !u!111 &111571702140813640
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1063291227705184}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!114 &114688806156832798
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 33063994179630438}
   - component: {fileID: 23796258156399496}
   - component: {fileID: 114228669294694364}
-  - component: {fileID: 111723654351001506}
   m_Layer: 0
   m_Name: tileRed
   m_TagString: Red
@@ -86,21 +85,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1279385451921632}
   m_Mesh: {fileID: 4300000, guid: 51c90e7fc12c18647a06e34eb98ea666, type: 3}
---- !u!111 &111723654351001506
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1279385451921632}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!114 &114228669294694364
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -6,6 +6,7 @@
 /// </summary>
 public class Puyo : MonoBehaviour
 {
+    #region Fields
     /// <summary>
     /// Current row of puyo.
     /// 현재 뿌요가 있는 행.
@@ -34,6 +35,8 @@ public class Puyo : MonoBehaviour
     /// <param name="row">뿌요의 행</param>
     /// <param name="columnA">뿌요의 열 A</param>
     /// <param name="columnB">뿌요의 열 B</param>
+#endregion
+
     public void Initialize(PuyoColor color, int row = 50, int columnA = 50, int columnB = 50)
     {
         Row = row;

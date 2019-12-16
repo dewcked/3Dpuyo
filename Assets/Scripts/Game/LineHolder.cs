@@ -5,7 +5,9 @@ using UnityEngine;
 public class LineHolder : MonoBehaviour {
 
     [SerializeField]
+#pragma warning disable CS0649 // Field 'LineHolder.LineGeneratorPrefab' is never assigned to, and will always have its default value null
     private GameObject LineGeneratorPrefab;
+#pragma warning restore CS0649 // Field 'LineHolder.LineGeneratorPrefab' is never assigned to, and will always have its default value null
 
 	// Use this for initialization
 	void Start () {

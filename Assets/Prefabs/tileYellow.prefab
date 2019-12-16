@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 33902731026006412}
   - component: {fileID: 23272735812865612}
   - component: {fileID: 114229778990889968}
-  - component: {fileID: 111753375405860466}
   m_Layer: 0
   m_Name: tileYellow
   m_TagString: Yellow
@@ -86,21 +85,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1685278633726408}
   m_Mesh: {fileID: 4300000, guid: deb166f8951470d4a942fd26519b9aed, type: 3}
---- !u!111 &111753375405860466
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1685278633726408}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!114 &114229778990889968
 MonoBehaviour:
   m_ObjectHideFlags: 1

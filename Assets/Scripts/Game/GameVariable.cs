@@ -49,4 +49,10 @@ public static class GameVariable {
     public static Control Scene = Control.Screen1;
 
     public static Vector3 MidPuyo = new Vector3(GameVariable.ColumnsA / 2 - GameVariable.BasePoint.x, 0f, GameVariable.ColumnsB / 2 - GameVariable.BasePoint.z);
+
+    public static bool isDanger = false;
+
+    public static int currentCombo = 0;
+
+    public static GameState gameState;
 }

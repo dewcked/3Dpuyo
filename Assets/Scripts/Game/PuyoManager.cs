@@ -4,316 +4,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts;
+using UnityEngine.Events;
 
 public class PuyoManager : MonoBehaviour
 {
-
     readonly GameObject[,,] puyos = new GameObject[GameVariable.Rows, GameVariable.ColumnsA, GameVariable.ColumnsB];
+    public PuyoPair fallingPair;
+    public List<PuyoPair> pairs = new List<PuyoPair>();
 
-    private PuyoPair fallingPair;
 
-    AudioSource mainBGM;
-    AudioSource Sound1;
-    AudioSource Sound2;
-    GameState gameState;
-
-    List<PuyoPair> pairs = new List<PuyoPair>();
-
-    int combo = 0;
-    
-
-    private float fallingSpeed = 0.3f;
-    private float time = 0f;
-    private float MoveKeytime = 0f;
-    private float DownKeytime = 0.02f;
-    private float RotateKeytime = 0.08f;
-
-    private float MoveKeySpeed = 0.05f;
-    private float DownKeySpeed = 0.02f;
-    private float RotateKeySpeed = 0.08f;
-
-    private float Delaytime = 0.8f;
-    private float CurrentDelay = 0f;
+    private bool firstRotate = true;
 
     [SerializeField]
+#pragma warning disable CS0649 // Field 'PuyoManager.puyoPrefabs' is never assigned to, and will always have its default value null
     private GameObject[] puyoPrefabs;
-    private bool firstMove = true;
-    private bool firstRotate = true;
+#pragma warning restore CS0649 // Field 'PuyoManager.puyoPrefabs' is never assigned to, and will always have its default value null
+    
+
+    public SoundManager SoundManager;
 
     void Awake()
     {
-        Sound1 = gameObject.AddComponent<AudioSource>();
-        Sound2 = gameObject.AddComponent<AudioSource>();
-        mainBGM = gameObject.AddComponent<AudioSource>();
-        mainBGM.clip = Resources.Load<AudioClip>("Game1");
-        mainBGM.loop = true;
-        mainBGM.Play();
-        gameState = GameState.Generate;
+        SoundManager = transform.FindChild("SoundManager").gameObject.GetComponent<SoundManager>();
     }
 
-    void Update()
-    {
-        time += Time.deltaTime;
-        MoveKeytime += Time.deltaTime;
-        DownKeytime += Time.deltaTime;
-        if(pairs.Count >= 2)
-        {
-            ShowNextPuyo();
-        }
-        switch (gameState)
-        {
-            case GameState.Generate:
-                //Debug.Log("gen");
-                gameState = GameState.Busy;
-                while (pairs.Count < 3)
-                    pairs.Add(GenerateNewPuyoPair());
-                gameState = GameState.Spawning;
-                break;
-            case GameState.Spawning:
-                //Debug.Log("spn");
-                gameState = GameState.Busy;
-                SpawnNewPair();
-                gameState = GameState.Falling;
-                break;
-            case GameState.Busy:
-                //Debug.Log("bsy");
-                break;
-            case GameState.CheckAndDestroy:
-                //Debug.Log("cad");
-                gameState = GameState.Busy;
-                DestroyAllChains();
-                ifDanger();
-                ifgameOver();
-                break;
-            case GameState.Falling:
-                //Debug.Log("fal");
-                if (fallingPair == null)
-                    break;
-                if (time >= fallingSpeed)
-                {
-                    controlBlock(Control.Fall);
-                    time = 0;
-                }
-                if (fallingPair == null)
-                    break;
-                rotatePuyo();
-                moveABPuyo();
-                dropPuyo();
-                break;
-            case GameState.Repositioning:
-                //Debug.Log("rep");
-                gameState = GameState.Busy;
-                UpdatePuyosPosition();
-                break;
-            case GameState.GameOver:
-                //Debug.Log("gov");
-                gameOverAction();
-                //Time.timeScale = 0f; // todo
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-    void FixedUpdate() { }
-    ///<summary>
-    ///Move Puyo by ColumnA
-    ///뿌요를 전후좌우로 움직이는 메서드.
-    ///</summary>
-    private void moveABPuyo()
-    {
-        var pressedA = Input.GetAxisRaw("HorizontalA");
-        var pressedB = Input.GetAxisRaw("HorizontalB");
-
-        if (pressedA == 0 && pressedB == 0)
-        {
-            firstMove = true;
-            return;
-        }
-        if (MoveKeytime >= MoveKeySpeed || firstMove == true)
-        {
-            if (pressedA == -1)
-            {
-                switch (GameVariable.Scene)
-                {
-                    case Control.Screen1:
-                        controlBlock(Control.MoveNegA);
-                        break;
-                    case Control.Screen2:
-                        controlBlock(Control.MoveNegB);
-                        break;
-                    case Control.Screen3:
-                        controlBlock(Control.MovePosA);
-                        break;
-                    case Control.Screen4:
-                        controlBlock(Control.MovePosB);
-                        break;
-                }
-            }
-            else if (pressedA == 1)
-            {
-                switch (GameVariable.Scene)
-                {
-                    case Control.Screen1:
-                        controlBlock(Control.MovePosA);
-                        break;
-                    case Control.Screen2:
-                        controlBlock(Control.MovePosB);
-                        break;
-                    case Control.Screen3:
-                        controlBlock(Control.MoveNegA);
-                        break;
-                    case Control.Screen4:
-                        controlBlock(Control.MoveNegB);
-                        break;
-                }
-            }
-            else if (pressedB == 1)
-            {
-                switch (GameVariable.Scene)
-                {
-                    case Control.Screen1:
-                        controlBlock(Control.MovePosB);
-                        break;
-                    case Control.Screen2:
-                        controlBlock(Control.MoveNegA);
-                        break;
-                    case Control.Screen3:
-                        controlBlock(Control.MoveNegB);
-                        break;
-                    case Control.Screen4:
-                        controlBlock(Control.MovePosA);
-                        break;
-                }
-            }
-            else if (pressedB == -1)
-            {
-                switch (GameVariable.Scene)
-                {
-                    case Control.Screen1:
-                        controlBlock(Control.MoveNegB);
-                        break;
-                    case Control.Screen2:
-                        controlBlock(Control.MovePosA);
-                        break;
-                    case Control.Screen3:
-                        controlBlock(Control.MovePosB);
-                        break;
-                    case Control.Screen4:
-                        controlBlock(Control.MoveNegA);
-                        break;
-                }
-            }
-        }
-        if (firstMove == true)
-        {
-            firstMove = false;
-            MoveKeytime = -0.1f;
-        }
-    }
-    /// <summary>
-    /// Move Puyo down.
-    /// 뿌요를 아래로 움직이는 메서드.
-    /// </summary>
-    private void dropPuyo()
-    {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            if (DownKeytime >= DownKeySpeed)
-            {
-                controlBlock(Control.Drop);
-                DownKeytime = 0;
-            }
-        }
-    }
-    /// <summary>
-    /// Rotate Puyo.
-    /// 뿌요를 회전시키는 메서드.
-    /// </summary>
-    private void rotatePuyo()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            switch (GameVariable.Scene)
-            {
-                case Control.Screen1:
-                    controlBlock(Control.RotateLeftA);
-                    break;
-                case Control.Screen2:
-                    controlBlock(Control.RotateBack);
-                    break;
-                case Control.Screen3:
-                    controlBlock(Control.RotateRightA);
-                    break;
-                case Control.Screen4:
-                    controlBlock(Control.RotateForth);
-                    break;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            switch (GameVariable.Scene)
-            {
-                case Control.Screen1:
-                    controlBlock(Control.RotateRightA);
-                    break;
-                case Control.Screen2:
-                    controlBlock(Control.RotateBack);
-                    break;
-                case Control.Screen3:
-                    controlBlock(Control.RotateLeftA);
-                    break;
-                case Control.Screen4:
-                    controlBlock(Control.RotateForth);
-                    break;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.W))
-        {
-            switch (GameVariable.Scene)
-            {
-                case Control.Screen1:
-                    controlBlock(Control.RotateBack);
-                    break;
-                case Control.Screen2:
-                    controlBlock(Control.RotateLeftA);
-                    break;
-                case Control.Screen3:
-                    controlBlock(Control.RotateForth);
-                    break;
-                case Control.Screen4:
-                    controlBlock(Control.RotateRightA);
-                    break;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.S))
-        {
-            switch (GameVariable.Scene)
-            {
-                case Control.Screen1:
-                    controlBlock(Control.RotateForth);
-                    break;
-                case Control.Screen2:
-                    controlBlock(Control.RotateRightA);
-                    break;
-                case Control.Screen3:
-                    controlBlock(Control.RotateBack);
-                    break;
-                case Control.Screen4:
-                    controlBlock(Control.RotateLeftA);
-                    break;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            controlBlock(Control.RotateHorizontalLeft);
-        }
-        else if (Input.GetKeyDown(KeyCode.RightShift))
-        {
-            controlBlock(Control.RotateHorizontalRight);
-        }
-    }
-
-    private PuyoPair GenerateNewPuyoPair()
+    public PuyoPair GenerateNewPuyoPair()
     {
         var rand1 = Convert.ToInt32(UnityEngine.Random.Range(0, 4));
 
@@ -458,9 +173,9 @@ public class PuyoManager : MonoBehaviour
                     }
         return true;
     }
-    private void controlBlock(Control PuyoControl)
+    public void controlBlock(Control PuyoControl)
     {
-        gameState = GameState.Busy;
+        GameVariable.gameState = GameState.Busy;
         bool canFall = canPairFall();
         Vector3[] changeVector = { Vector3.zero, Vector3.zero, Vector3.zero };
         switch (PuyoControl)
@@ -473,7 +188,7 @@ public class PuyoManager : MonoBehaviour
                 }
                 else
                 {
-                    gameState = GameState.Busy;
+                    GameVariable.gameState = GameState.Busy;
                     StartCoroutine(FixPair());
                 }
                 break;
@@ -482,12 +197,11 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position -= new Vector3(0f, 0.5f, 0f);
                     fallingPair.Puyo2.transform.position -= new Vector3(0f, 0.5f, 0f);
-                    Sound1.clip = Resources.Load<AudioClip>("movePuyo");
-                    Sound1.Play();
+                    SoundManager.PlaySound(FX.Move);
                 }
                 else
                 {
-                    gameState = GameState.Busy;
+                    GameVariable.gameState = GameState.Busy;
                     StartCoroutine(FixPair());
                 }
                 break;
@@ -496,8 +210,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += new Vector3(1f, 0f, 0f);
                     fallingPair.Puyo2.transform.position += new Vector3(1f, 0f, 0f);
-                    Sound1.clip = Resources.Load<AudioClip>("movePuyo");
-                    Sound1.Play();
+                    SoundManager.PlaySound(FX.Move);
                     firstRotate = true;
                 }
                 break;
@@ -506,8 +219,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position -= new Vector3(1f, 0f, 0f);
                     fallingPair.Puyo2.transform.position -= new Vector3(1f, 0f, 0f);
-                    Sound1.clip = Resources.Load<AudioClip>("movePuyo");
-                    Sound1.Play();
+                    SoundManager.PlaySound(FX.Move);
                     firstRotate = true;
                 }
                 break;
@@ -516,8 +228,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += new Vector3(0f, 0f, 1f);
                     fallingPair.Puyo2.transform.position += new Vector3(0f, 0f, 1f);
-                    Sound1.clip = Resources.Load<AudioClip>("movePuyo");
-                    Sound1.Play();
+                    SoundManager.PlaySound(FX.Move);
                     firstRotate = true;
                 }
                 break;
@@ -526,8 +237,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position -= new Vector3(0f, 0f, 1f);
                     fallingPair.Puyo2.transform.position -= new Vector3(0f, 0f, 1f);
-                    Sound1.clip = Resources.Load<AudioClip>("movePuyo");
-                    Sound1.Play();
+                    SoundManager.PlaySound(FX.Move);
                     firstRotate = true;
                 }
                 break;
@@ -537,8 +247,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -552,8 +261,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -567,8 +275,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -582,8 +289,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -597,8 +303,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -612,8 +317,7 @@ public class PuyoManager : MonoBehaviour
                 {
                     fallingPair.Puyo1.transform.position += changeVector[0];
                     fallingPair.Puyo2.transform.position += changeVector[1];
-                    Sound2.clip = Resources.Load<AudioClip>("rotatePuyo");
-                    Sound2.Play();
+                    SoundManager.PlaySound(FX.Rotate);
                     firstRotate = true;
                 }
                 else
@@ -622,7 +326,7 @@ public class PuyoManager : MonoBehaviour
                 }
                 break;
         }
-        gameState = GameState.Falling;
+        GameVariable.gameState = GameState.Falling;
     }
 
     private Vector3[] canRotate(Control Direction)
@@ -1250,45 +954,37 @@ public class PuyoManager : MonoBehaviour
 
         // ResetFallingPair
         fallingPair = null;
-        combo = 0;
+        GameVariable.currentCombo = 0;
         yield return new WaitForSeconds(3 * GameVariable.PuyoRepositioningSpeed);
-        gameState = GameState.Repositioning;
+        GameVariable.gameState = GameState.Repositioning;
     }
-    private void ifgameOver()
+    public void ifgameOver()
     {
         for (int i = 0; i < GameVariable.ColumnsA; i++)
             for (int j = 0; j < GameVariable.ColumnsB; j++)
             {
                 if (puyos[12, i, j] != null)
                 {
-                    mainBGM.Stop();
-                    gameState = GameState.GameOver;
+                    SoundManager.StopSound();
+                    GameVariable.gameState = GameState.GameOver;
                 }
             }
     }
-    private void ifDanger()
+    public void ifDanger()
     {
         for (int i = 0; i < GameVariable.ColumnsA; i++)
             for (int j = 0; j < GameVariable.ColumnsB; j++)
             {
                 if (puyos[9, i, j] != null)
                 {
-                    if (mainBGM.clip.name != "Warn")
-                    {
-                        mainBGM.clip = Resources.Load<AudioClip>("Warn");
-                        mainBGM.Play();
-                    }
+                    GameVariable.isDanger = true;
                     return;
                 }
             }
-        if (mainBGM.clip.name == "Warn")
-        {
-            mainBGM.clip = Resources.Load<AudioClip>("Game1");
-            mainBGM.Play();
-        }
+        GameVariable.isDanger = false;
 
     }
-    private void gameOverAction()
+    public void gameOverAction()
     {
         var biggestRatio = 0f;
 
@@ -1334,7 +1030,7 @@ public class PuyoManager : MonoBehaviour
         pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
     }
 
-    private void ShowNextPuyo()
+    public void ShowNextPuyo()
     {
         switch (GameVariable.Scene)
         {
@@ -1472,7 +1168,7 @@ public class PuyoManager : MonoBehaviour
 
         yield return new WaitForSeconds(biggestRatio * GameVariable.PuyoRepositioningSpeed);
 
-        gameState = GameState.CheckAndDestroy;
+        GameVariable.gameState = GameState.CheckAndDestroy;
     }
 
     private void InitRandomArray()
@@ -1496,14 +1192,14 @@ public class PuyoManager : MonoBehaviour
         }
     }
 
-    private void DestroyAllChains()
+    public void DestroyAllChains()
     {
         var chains = FindAllChains();
         if (chains.Any())
         {
             foreach (var chain in chains)
             {
-                ComboSoundPlay();
+                ProcessComboEffect();
                 foreach (var puyo in chain.Puyos)
                 {
                     StartCoroutine(AnimateAndDestroy(puyo));
@@ -1512,61 +1208,29 @@ public class PuyoManager : MonoBehaviour
         }
         else
         {
-            gameState = GameState.Generate;
+            GameVariable.gameState = GameState.Generate;
         }
 
     }
-    private void ComboSoundPlay()
+    
+    private void ProcessComboEffect()
     {
-        ++combo;
-        Debug.Log(combo);
-        switch (combo)
-        {
-            case 1:
-                Sound1.clip = Resources.Load<AudioClip>("combo1");
-                break;
-            case 2:
-                Sound1.clip = Resources.Load<AudioClip>("combo2");
-                break;
-            case 3:
-                Sound1.clip = Resources.Load<AudioClip>("combo3");
-                break;
-            case 4:
-                Sound1.clip = Resources.Load<AudioClip>("combo4");
-                break;
-            case 5:
-                Sound1.clip = Resources.Load<AudioClip>("combo5");
-                break;
-            case 6:
-                Sound1.clip = Resources.Load<AudioClip>("combo6");
-                break;
-            case 7:
-                Sound1.clip = Resources.Load<AudioClip>("combo7");
-                break;
-        }
-        Sound1.Play();
+        GameVariable.currentCombo++;
+        SoundManager.PlaySound(FX.Combo);
     }
+
     private IEnumerator AnimateAndDestroy(Puyo puyo)
     {
-        var animationComponent = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].GetComponent<Animation>();
-        animationComponent.Play();
-        int count = 0;
-        if (count < 3)
-        {
-            puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
-            yield return new WaitForSeconds(0.3f);
-            puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(true);
-            yield return new WaitForSeconds(0.3f);
-            count++;
-        }
-        do
-        {
-            yield return null;
-        } while (animationComponent.isPlaying);
+        puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
+        yield return new WaitForSeconds(0.3f);
+        puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(true);
+        yield return new WaitForSeconds(0.3f);
+        puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
+        yield return new WaitForSeconds(0.3f);
 
         DestroyPuyo(puyo);
 
-        gameState = GameState.Repositioning;
+        GameVariable.gameState = GameState.Repositioning;
     }
 
     private void DestroyPuyo(Puyo puyo)

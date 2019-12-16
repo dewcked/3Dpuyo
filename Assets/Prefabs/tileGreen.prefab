@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 114067258570097764}
   - component: {fileID: 33621131563016050}
   - component: {fileID: 23105008666546038}
-  - component: {fileID: 111526823843989346}
   m_Layer: 0
   m_Name: tileGreen
   m_TagString: Green
@@ -86,21 +85,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1630579710278920}
   m_Mesh: {fileID: 4300000, guid: e2591c8406720e94686fc79a61cbb0b9, type: 3}
---- !u!111 &111526823843989346
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1630579710278920}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_Animations:
-  - {fileID: 7400000, guid: 9c228f0fb7f427c47b1979d2692a2460, type: 2}
-  m_WrapMode: 0
-  m_PlayAutomatically: 0
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!114 &114067258570097764
 MonoBehaviour:
   m_ObjectHideFlags: 1
