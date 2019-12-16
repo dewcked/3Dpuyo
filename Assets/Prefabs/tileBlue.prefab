@@ -56,7 +56,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_Materials:
   - {fileID: 2100000, guid: 6ecebd1d03eb3ba468d9122ec875a57b, type: 2}
-  - {fileID: 2100000, guid: ce60989a0367e2c41885dd494119f627, type: 2}
+  - {fileID: 2100000, guid: cf40578dd76d3c0488ed2709ca7c7600, type: 2}
   - {fileID: 2100000, guid: bdc71f44a87963944a0e134c7ee1bb0d, type: 2}
   - {fileID: 2100000, guid: f74b4e283010a6c40a87032b879ff782, type: 2}
   - {fileID: 2100000, guid: 5c5b42a73745e944785f7d4476ac6f89, type: 2}
