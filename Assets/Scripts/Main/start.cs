@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class start : MonoBehaviour {
 #pragma warning disable CS0108 // 'start.audio' hides inherited member 'Component.audio'. Use the new keyword if hiding was intended.
@@ -23,8 +24,6 @@ public class start : MonoBehaviour {
 	}
     void nextScean()
     {
-#pragma warning disable CS0618 // 'Application.LoadLevel(string)' is obsolete: 'Use SceneManager.LoadScene'
-        Application.LoadLevel("Gameplay");
-#pragma warning restore CS0618 // 'Application.LoadLevel(string)' is obsolete: 'Use SceneManager.LoadScene'
+        SceneManager.LoadScene("Gameplay");
     }
 }

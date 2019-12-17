@@ -27,11 +27,17 @@ public class PuyoManager : MonoBehaviour
     private void Update()
     {
         if (pairs.Count >= 2)
-        {
             ShowNextPuyo();
-        }
     }
 
+    // Generate
+    public IEnumerator GenerateNewPuyoPairs(System.Action<bool> callBack)
+    {
+        while (pairs.Count < 3)
+            pairs.Add(GenerateNewPuyoPair());
+        yield return null;
+        callBack(true);
+    }
     public PuyoPair GenerateNewPuyoPair()
     {
         var rand1 = Convert.ToInt32(UnityEngine.Random.Range(0, 4));
@@ -49,6 +55,119 @@ public class PuyoManager : MonoBehaviour
         go2.transform.Rotate(new Vector3(180f, 0f, 0f));
 
         return new PuyoPair(go1, go2);
+    }
+    // Spawn
+    public IEnumerator SpawnNewPair(System.Action<bool> callBack)
+    {
+        if (pairs.Any())
+        {
+            pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 12f, GameVariable.MidPuyo.z);
+            pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 13f, GameVariable.MidPuyo.z);
+            fallingPair = pairs.First();
+            pairs.Remove(pairs.First());
+        }
+        pairs.ElementAt(1).Puyo1.transform.position = new Vector3(7.5f, 7f, GameVariable.MidPuyo.z);
+        pairs.ElementAt(1).Puyo2.transform.position = new Vector3(7.5f, 8f, GameVariable.MidPuyo.z);
+
+        pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
+        pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
+
+        yield return null;
+        callBack(true);
+    }
+    public void ShowNextPuyo()
+    {
+        switch (GameVariable.Scene)
+        {
+            case Control.Screen1:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(7.5f, 7f, GameVariable.MidPuyo.z);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(7.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
+                break;
+            case Control.Screen2:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, 7.5f);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 7.5f);
+                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 6.5f);
+                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, 6.5f);
+                break;
+            case Control.Screen3:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(-5.5f, 7f, GameVariable.MidPuyo.z);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(-5.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo1.transform.position = new Vector3(-4.5f, 8f, GameVariable.MidPuyo.z);
+                pairs.First().Puyo2.transform.position = new Vector3(-4.5f, 9f, GameVariable.MidPuyo.z);
+                break;
+            case Control.Screen4:
+                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, -5.5f);
+                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -5.5f);
+                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -4.5f);
+                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, -4.5f);
+                break;
+        }
+    }
+    // Fall
+
+    // Fix
+    public IEnumerator FixPair(System.Action<int> callBack)
+    {
+        var p1 = fallingPair.Puyo1.transform.position;
+        var p2 = fallingPair.Puyo2.transform.position;
+        // Find Column and Row
+        var p1colA = (int)p1.x;
+        var p1colB = (int)p1.z;
+        var p1row = (int)p1.y;
+
+        var p2colA = (int)p2.x;
+        var p2colB = (int)p2.z;
+        var p2row = (int)p2.y;
+
+        puyos[p1row, p1colA, p1colB] = fallingPair.Puyo1;
+        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().ColumnA = p1colA;
+        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().ColumnB = p1colB;
+        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().Row = p1row;
+
+        puyos[p2row, p2colA, p2colB] = fallingPair.Puyo2;
+        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().ColumnA = p2colA;
+        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().ColumnB = p2colB;
+        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().Row = p2row;
+
+        // ResetFallingPair
+        fallingPair = null;
+        GameVariable.currentCombo = 0;
+        yield return new WaitForSeconds(3 * GameVariable.PuyoRepositioningSpeed);
+        if (ifGameOver())
+            callBack(0);
+        else if (ifDanger())
+            callBack(1);
+        else
+            callBack(2);
+    }
+    public bool ifGameOver()
+    {
+        for (int i = 0; i < GameVariable.ColumnsA; i++)
+            for (int j = 0; j < GameVariable.ColumnsB; j++)
+            {
+                if (puyos[12, i, j] != null)
+                {
+                    SoundManager.StopSound();
+                    return true;
+                }
+            }
+        return false;
+    }
+    public bool ifDanger()
+    {
+        for (int i = 0; i < GameVariable.ColumnsA; i++)
+            for (int j = 0; j < GameVariable.ColumnsB; j++)
+            {
+                if (puyos[9, i, j] != null)
+                {
+                    GameVariable.isDanger = true;
+                    return true;
+                }
+            }
+        GameVariable.isDanger = false;
+        return false;
     }
 
     public bool isPairFalling()
@@ -907,117 +1026,10 @@ public class PuyoManager : MonoBehaviour
         return momentum;
     }
 
-    public void FixPair()
-    {
-        // Find Column and Row
-        var p1colA = (int)fallingPair.Puyo1.transform.position.x;
-        var p1colB = (int)fallingPair.Puyo1.transform.position.z;
-        var p1row = (int)fallingPair.Puyo1.transform.position.y;
-
-        var p2colA = (int)fallingPair.Puyo2.transform.position.x;
-        var p2colB = (int)fallingPair.Puyo2.transform.position.z;
-        var p2row = (int)fallingPair.Puyo2.transform.position.y;
-
-        //Debug.Log(string.Format("p1 col : {0}, p1 row : {1}\np2col : {2}, p2row : {3}", p1col, p1row, p2col, p2row));
-
-        // Update array
-
-        puyos[p1row, p1colA, p1colB] = fallingPair.Puyo1;
-        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().ColumnA = p1colA;
-        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().ColumnB = p1colB;
-        puyos[p1row, p1colA, p1colB].GetComponent<Puyo>().Row = p1row;
-
-        puyos[p2row, p2colA, p2colB] = fallingPair.Puyo2;
-        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().ColumnA = p2colA;
-        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().ColumnB = p2colB;
-        puyos[p2row, p2colA, p2colB].GetComponent<Puyo>().Row = p2row;
-
-        // ResetFallingPair
-        fallingPair = null;
-        GameVariable.currentCombo = 0;
-    }
-    public bool ifgameOver()
-    {
-        for (int i = 0; i < GameVariable.ColumnsA; i++)
-            for (int j = 0; j < GameVariable.ColumnsB; j++)
-            {
-                if (puyos[12, i, j] != null)
-                {
-                    SoundManager.StopSound();
-                    return true;
-                }
-            }
-        return false;
-    }
-    public void ifDanger()
-    {
-        for (int i = 0; i < GameVariable.ColumnsA; i++)
-            for (int j = 0; j < GameVariable.ColumnsB; j++)
-            {
-                if (puyos[9, i, j] != null)
-                {
-                    GameVariable.isDanger = true;
-                    return;
-                }
-            }
-        GameVariable.isDanger = false;
-
-    }
-
-    public void SpawnNewPair()
-    {
-        //todo: update element locations every scene
-        if (pairs.Any())
-        {
-            pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 12f, GameVariable.MidPuyo.z);
-            pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 13f, GameVariable.MidPuyo.z);
-            fallingPair = pairs.First();
-            pairs.Remove(pairs.First());
-        }
-        pairs.ElementAt(1).Puyo1.transform.position = new Vector3(7.5f, 7f, GameVariable.MidPuyo.z);
-        pairs.ElementAt(1).Puyo2.transform.position = new Vector3(7.5f, 8f, GameVariable.MidPuyo.z);
-
-        pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
-        pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
-    }
-
-    public void ShowNextPuyo()
-    {
-        switch (GameVariable.Scene)
-        {
-            case Control.Screen1:
-                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(7.5f, 7f, GameVariable.MidPuyo.z);
-                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(7.5f, 8f, GameVariable.MidPuyo.z);
-                pairs.First().Puyo1.transform.position = new Vector3(6.5f, 8f, GameVariable.MidPuyo.z);
-                pairs.First().Puyo2.transform.position = new Vector3(6.5f, 9f, GameVariable.MidPuyo.z);
-                break;
-            case Control.Screen2:
-                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, 7.5f);
-                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 7.5f);
-                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, 6.5f);
-                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, 6.5f);
-                break;
-            case Control.Screen3:
-                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(-5.5f, 7f, GameVariable.MidPuyo.z);
-                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(-5.5f, 8f, GameVariable.MidPuyo.z);
-                pairs.First().Puyo1.transform.position = new Vector3(-4.5f, 8f, GameVariable.MidPuyo.z);
-                pairs.First().Puyo2.transform.position = new Vector3(-4.5f, 9f, GameVariable.MidPuyo.z);
-                break;
-            case Control.Screen4:
-                pairs.ElementAt(1).Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 7f, -5.5f);
-                pairs.ElementAt(1).Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -5.5f);
-                pairs.First().Puyo1.transform.position = new Vector3(GameVariable.MidPuyo.x, 8f, -4.5f);
-                pairs.First().Puyo2.transform.position = new Vector3(GameVariable.MidPuyo.x, 9f, -4.5f);
-                break;
-        }
-        
-    }
-
     public void UpdatePuyosPosition()
     {
         ComputeNewPuyosPosition();
     }
-
     private void MovePuyos()
     {
         for (int i = 0; i < GameVariable.Rows; i++)
@@ -1146,16 +1158,38 @@ public class PuyoManager : MonoBehaviour
         SoundManager.PlaySound(FX.Combo);
     }
 
-    public IEnumerator AnimateAndDestroy(Puyo puyo)
+    public IEnumerator DestroyAllChains(System.Action<bool> callBack)
+    {
+        var chains = FindAllChains();
+        if (chains.Any())
+        {
+            foreach (var chain in chains)
+            {
+                ProcessComboEffect();
+                foreach (var puyo in chain.Puyos)
+                {
+                    StartCoroutine(AnimateAndDestroy(puyo, innercallBack =>
+                    {
+                        callBack(false);
+                    }));
+                }
+            }
+        }
+        yield return null;
+        callBack(true);
+    }
+
+    public IEnumerator AnimateAndDestroy(Puyo puyo, System.Action<bool> innerCallBack)
     {
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.25f);
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(true);
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.25f);
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.25f);
 
         DestroyPuyo(puyo);
+        innerCallBack(true);
     }
 
     private void DestroyPuyo(Puyo puyo)
@@ -1330,7 +1364,7 @@ public class PuyoManager : MonoBehaviour
         yield return new WaitForSeconds(biggestRatio * 0.1f * speed);
     }
 
-    public IEnumerator GameOverAction()
+    public IEnumerator GameOverAction(System.Action<bool> callBack)
     {
         // 1 = Screen1, 2 = Screen2, 3 = Screen3, 4 = Screen4
         for (int count = 0; count < 4; count++)
@@ -1368,6 +1402,7 @@ public class PuyoManager : MonoBehaviour
                     if (puyos[i, j, k] != null)
                          StartCoroutine(PuyoToHell(speed[j][k], i, j, k));
         yield return null;
+        callBack(true);
     }
 }
 

@@ -52,12 +52,14 @@ public enum Control
 public enum GameState
 {
     Busy,
+    Generate,
     Spawning,
     Falling,
+    Fixing,
     CheckAndDestroy,
     Repositioning,
     GameOver,
-    Generate
+    WaitingForInput
 }
 
 public enum FX
