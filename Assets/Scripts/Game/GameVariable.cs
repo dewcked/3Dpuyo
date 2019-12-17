@@ -53,6 +53,4 @@ public static class GameVariable {
     public static bool isDanger = false;
 
     public static int currentCombo = 0;
-
-    public static GameState gameState;
 }

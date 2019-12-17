@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
@@ -28,10 +29,12 @@ public class GameManager : MonoBehaviour {
 #pragma warning restore CS0414 // The field 'PuyoManager.CurrentDelay' is assigned but its value is never used
     private bool firstMove = true;
 
+    private GameState gameState;
+
     // Use this for initialization
     void Awake () {
         PuyoManager = transform.FindChild("PuyoManager").gameObject.GetComponent<PuyoManager>();
-        GameVariable.gameState = GameState.Generate;
+        gameState = GameState.Generate;
     }
 	
 	// Update is called once per frame
@@ -39,64 +42,125 @@ public class GameManager : MonoBehaviour {
 		time += Time.deltaTime;
         MoveKeytime += Time.deltaTime;
         DownKeytime += Time.deltaTime;
-        if(PuyoManager.pairs.Count >= 2)
-        {
-            PuyoManager.ShowNextPuyo();
-        }
-        switch (GameVariable.gameState)
+        
+        switch (gameState)
         {
             case GameState.Generate:
                 //Debug.Log("gen");
-                GameVariable.gameState = GameState.Busy;
+                gameState = GameState.Busy;
                 while (PuyoManager.pairs.Count < 3)
                     PuyoManager.pairs.Add(PuyoManager.GenerateNewPuyoPair());
-                GameVariable.gameState = GameState.Spawning;
+                gameState = GameState.Spawning;
                 break;
             case GameState.Spawning:
                 //Debug.Log("spn");
-                GameVariable.gameState = GameState.Busy;
+                gameState = GameState.Busy;
                 PuyoManager.SpawnNewPair();
-                GameVariable.gameState = GameState.Falling;
+                gameState = GameState.Falling;
                 break;
             case GameState.Busy:
                 //Debug.Log("bsy");
                 break;
             case GameState.CheckAndDestroy:
                 //Debug.Log("cad");
-                GameVariable.gameState = GameState.Busy;
-                PuyoManager.DestroyAllChains();
-                PuyoManager.ifDanger();
-                PuyoManager.ifgameOver();
+                gameState = GameState.Busy;
+                CheckAndDestroy();
                 break;
             case GameState.Falling:
                 //Debug.Log("fal");
-                if (PuyoManager.fallingPair == null)
-                    break;
-                if (time >= fallingSpeed)
-                {
-                    PuyoManager.controlBlock(Control.Fall);
-                    time = 0;
-                }
-                if (PuyoManager.fallingPair == null)
-                    break;
-                rotatePuyo();
-                moveABPuyo();
-                dropPuyo();
+                gameState = GameState.Busy;
+                ForcePuyo();
                 break;
             case GameState.Repositioning:
                 //Debug.Log("rep");
-                GameVariable.gameState = GameState.Busy;
-                PuyoManager.UpdatePuyosPosition();
+                gameState = GameState.Busy;
+                StartCoroutine(RepositePuyo());
                 break;
             case GameState.GameOver:
                 //Debug.Log("gov");
-                PuyoManager.gameOverAction();
+                gameState = GameState.Busy;
+                GameOver();
                 //Time.timeScale = 0f; // todo
                 break;
             default:
                 throw new System.ArgumentOutOfRangeException();
         }
 	}
+
+    private void GameOver()
+    {
+        StartCoroutine(PuyoManager.GameOverAction());
+    }
+
+    private IEnumerator FixPair()
+    {
+        PuyoManager.FixPair();
+        yield return new WaitForSeconds(3 * GameVariable.PuyoRepositioningSpeed);
+        if (PuyoManager.ifgameOver())
+            gameState = GameState.GameOver;
+        else
+            gameState = GameState.Repositioning;
+    }
+
+    public IEnumerator DestroyAllChains()
+    {
+        var chains = PuyoManager.FindAllChains();
+        if (chains.Any())
+        {
+            foreach (var chain in chains)
+            {
+                PuyoManager.ProcessComboEffect();
+                foreach (var puyo in chain.Puyos)
+                {
+                    StartCoroutine(PuyoManager.AnimateAndDestroy(puyo));
+                }
+                yield return new WaitForSeconds(1f);
+                gameState = GameState.Repositioning;
+            }
+        }
+        else
+        {
+            gameState = GameState.Generate;
+        }
+        yield return null;
+    }
+
+    private void CheckAndDestroy()
+    {
+        StartCoroutine(DestroyAllChains());
+    }
+
+    private IEnumerator RepositePuyo() {
+
+        PuyoManager.UpdatePuyosPosition();
+        StartCoroutine(PuyoManager.MovePuyosToNewPosition(callBack =>
+        {
+            gameState = GameState.CheckAndDestroy;
+        }));
+        yield return null;
+    }
+
+    private void ForcePuyo()
+    {
+        if (!PuyoManager.isPairFalling())
+            return;
+        if (time >= fallingSpeed)
+        {
+            if (PuyoManager.canPairFall())
+                PuyoManager.controlBlock(Control.Fall);
+            else
+            {
+                StartCoroutine(FixPair());
+            }
+            time = 0;
+        }
+        if (!PuyoManager.isPairFalling())
+            return;
+        rotatePuyo();
+        moveABPuyo();
+        dropPuyo();
+    }
+
 
     ///<summary>
     ///Move Puyo by ColumnA
@@ -189,6 +253,7 @@ public class GameManager : MonoBehaviour {
                 MoveKeytime = -0.1f;
             }
         }
+        gameState = GameState.Falling;
     }
     /// <summary>
     /// Move Puyo down.
@@ -198,9 +263,19 @@ public class GameManager : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.Space) == true && DownKeytime >= DownKeySpeed)
         {
-            PuyoManager.controlBlock(Control.Drop);
+            if (PuyoManager.canPairFall())
+            {
+                PuyoManager.controlBlock(Control.Drop);
+                gameState = GameState.Falling;
+            }
+            else
+            {
+                StartCoroutine(FixPair());
+            }
             DownKeytime = 0;
         }
+        else
+            gameState = GameState.Falling;
     }
     /// <summary>
     /// Rotate Puyo.
@@ -288,5 +363,6 @@ public class GameManager : MonoBehaviour {
         {
             PuyoManager.controlBlock(Control.RotateHorizontalRight);
         }
+        gameState = GameState.Falling;
     }
 }

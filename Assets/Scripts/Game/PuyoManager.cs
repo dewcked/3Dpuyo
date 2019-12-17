@@ -12,20 +12,24 @@ public class PuyoManager : MonoBehaviour
     public PuyoPair fallingPair;
     public List<PuyoPair> pairs = new List<PuyoPair>();
 
-
     private bool firstRotate = true;
 
     [SerializeField]
-#pragma warning disable CS0649 // Field 'PuyoManager.puyoPrefabs' is never assigned to, and will always have its default value null
     private GameObject[] puyoPrefabs;
-#pragma warning restore CS0649 // Field 'PuyoManager.puyoPrefabs' is never assigned to, and will always have its default value null
-    
 
     public SoundManager SoundManager;
 
     void Awake()
     {
         SoundManager = transform.FindChild("SoundManager").gameObject.GetComponent<SoundManager>();
+    }
+
+    private void Update()
+    {
+        if (pairs.Count >= 2)
+        {
+            ShowNextPuyo();
+        }
     }
 
     public PuyoPair GenerateNewPuyoPair()
@@ -47,11 +51,17 @@ public class PuyoManager : MonoBehaviour
         return new PuyoPair(go1, go2);
     }
 
+    public bool isPairFalling()
+    {
+        if (fallingPair == null)
+            return false;
+        return true;
+    }
     /// <summary>
     /// Check if can fall
     /// </summary>
     /// <returns></returns>
-    private bool canPairFall()
+    public bool canPairFall()
     {
         var p1pos = fallingPair.Puyo1.transform.position;
         var p2pos = fallingPair.Puyo2.transform.position;
@@ -173,37 +183,20 @@ public class PuyoManager : MonoBehaviour
                     }
         return true;
     }
+
     public void controlBlock(Control PuyoControl)
     {
-        GameVariable.gameState = GameState.Busy;
-        bool canFall = canPairFall();
         Vector3[] changeVector = { Vector3.zero, Vector3.zero, Vector3.zero };
         switch (PuyoControl)
         {
-            case Control.Fall:
-                if (canFall)
-                {
-                    fallingPair.Puyo1.transform.position -= new Vector3(0f, 0.5f, 0f);
-                    fallingPair.Puyo2.transform.position -= new Vector3(0f, 0.5f, 0f);
-                }
-                else
-                {
-                    GameVariable.gameState = GameState.Busy;
-                    StartCoroutine(FixPair());
-                }
-                break;
             case Control.Drop:
-                if (canFall)
-                {
-                    fallingPair.Puyo1.transform.position -= new Vector3(0f, 0.5f, 0f);
-                    fallingPair.Puyo2.transform.position -= new Vector3(0f, 0.5f, 0f);
-                    SoundManager.PlaySound(FX.Move);
-                }
-                else
-                {
-                    GameVariable.gameState = GameState.Busy;
-                    StartCoroutine(FixPair());
-                }
+                fallingPair.Puyo1.transform.position -= new Vector3(0f, 0.5f, 0f);
+                fallingPair.Puyo2.transform.position -= new Vector3(0f, 0.5f, 0f);
+                SoundManager.PlaySound(FX.Move);
+                break;
+            case Control.Fall:
+                fallingPair.Puyo1.transform.position -= new Vector3(0f, 0.5f, 0f);
+                fallingPair.Puyo2.transform.position -= new Vector3(0f, 0.5f, 0f);
                 break;
             case Control.MovePosA:
                 if (canGoPosA())
@@ -326,7 +319,6 @@ public class PuyoManager : MonoBehaviour
                 }
                 break;
         }
-        GameVariable.gameState = GameState.Falling;
     }
 
     private Vector3[] canRotate(Control Direction)
@@ -915,20 +907,8 @@ public class PuyoManager : MonoBehaviour
         return momentum;
     }
 
-    private IEnumerator FixPair()
+    public void FixPair()
     {
-        // todo correct puyo position and add to array and add column and row properties
-
-        // Round Pos
-        //var p1pos = fallingPair.Puyo1.transform.position;
-        //var roundedP1PosY = (float)Math.Round(p1pos.y);
-        //fallingPair.Puyo1.transform.position = new Vector3(p1pos.x, roundedP1PosY);
-
-        //var p2pos = fallingPair.Puyo2.transform.position;
-        //var roundedP2PosY = (float)Math.Round(p2pos.y);
-        //fallingPair.Puyo2.transform.position = new Vector3(p2pos.x, roundedP2PosY);
-
-
         // Find Column and Row
         var p1colA = (int)fallingPair.Puyo1.transform.position.x;
         var p1colB = (int)fallingPair.Puyo1.transform.position.z;
@@ -955,10 +935,8 @@ public class PuyoManager : MonoBehaviour
         // ResetFallingPair
         fallingPair = null;
         GameVariable.currentCombo = 0;
-        yield return new WaitForSeconds(3 * GameVariable.PuyoRepositioningSpeed);
-        GameVariable.gameState = GameState.Repositioning;
     }
-    public void ifgameOver()
+    public bool ifgameOver()
     {
         for (int i = 0; i < GameVariable.ColumnsA; i++)
             for (int j = 0; j < GameVariable.ColumnsB; j++)
@@ -966,9 +944,10 @@ public class PuyoManager : MonoBehaviour
                 if (puyos[12, i, j] != null)
                 {
                     SoundManager.StopSound();
-                    GameVariable.gameState = GameState.GameOver;
+                    return true;
                 }
             }
+        return false;
     }
     public void ifDanger()
     {
@@ -983,34 +962,6 @@ public class PuyoManager : MonoBehaviour
             }
         GameVariable.isDanger = false;
 
-    }
-    public void gameOverAction()
-    {
-        var biggestRatio = 0f;
-
-        for (int i = 0; i < GameVariable.Rows; i++)
-        {
-            for (int j = 0; j < GameVariable.ColumnsA; j++)
-            {
-                for (int k = 0; k < GameVariable.ColumnsB; k++)
-                {
-                    var puyo = puyos[i, j, k];
-                    if (puyo != null)
-                    {
-                        var oldPosition = puyo.transform.position;
-                        var newPosition = FindPuyoScreenPosition(i, j, k);
-
-                        // Position is correct, skip and continue with the next puyo
-                        if (oldPosition.y == newPosition.y) continue;
-
-                        var ratio = (oldPosition.y - newPosition.y) / GameVariable.PuyoSize.y;
-                        if (ratio > biggestRatio) biggestRatio = ratio;
-
-                        puyo.transform.positionTo(GameVariable.PuyoRepositioningSpeed * ratio, newPosition);
-                    }
-                }
-            }
-        }
     }
 
     public void SpawnNewPair()
@@ -1065,7 +1016,6 @@ public class PuyoManager : MonoBehaviour
     public void UpdatePuyosPosition()
     {
         ComputeNewPuyosPosition();
-        StartCoroutine(MovePuyosToNewPosition());
     }
 
     private void MovePuyos()
@@ -1137,7 +1087,7 @@ public class PuyoManager : MonoBehaviour
     /// Tween Puyos to new positions
     /// </summary>
     /// <returns></returns>
-    private IEnumerator MovePuyosToNewPosition()
+    public IEnumerator MovePuyosToNewPosition(System.Action<bool> callBack)
     {
         // We use this variable to store the biggest ratio, it is used to know how many time we have to wait for the tween to complete
         var biggestRatio = 0f;
@@ -1165,10 +1115,8 @@ public class PuyoManager : MonoBehaviour
                 }
             }
         }
-
         yield return new WaitForSeconds(biggestRatio * GameVariable.PuyoRepositioningSpeed);
-
-        GameVariable.gameState = GameState.CheckAndDestroy;
+        callBack(true);
     }
 
     private void InitRandomArray()
@@ -1191,35 +1139,14 @@ public class PuyoManager : MonoBehaviour
             }
         }
     }
-
-    public void DestroyAllChains()
-    {
-        var chains = FindAllChains();
-        if (chains.Any())
-        {
-            foreach (var chain in chains)
-            {
-                ProcessComboEffect();
-                foreach (var puyo in chain.Puyos)
-                {
-                    StartCoroutine(AnimateAndDestroy(puyo));
-                }
-            }
-        }
-        else
-        {
-            GameVariable.gameState = GameState.Generate;
-        }
-
-    }
     
-    private void ProcessComboEffect()
+    public void ProcessComboEffect()
     {
         GameVariable.currentCombo++;
         SoundManager.PlaySound(FX.Combo);
     }
 
-    private IEnumerator AnimateAndDestroy(Puyo puyo)
+    public IEnumerator AnimateAndDestroy(Puyo puyo)
     {
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return new WaitForSeconds(0.3f);
@@ -1229,8 +1156,6 @@ public class PuyoManager : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         DestroyPuyo(puyo);
-
-        GameVariable.gameState = GameState.Repositioning;
     }
 
     private void DestroyPuyo(Puyo puyo)
@@ -1239,7 +1164,7 @@ public class PuyoManager : MonoBehaviour
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB] = null;
     }
 
-    private List<PuyoGroup> FindAllChains()
+    public List<PuyoGroup> FindAllChains()
     {
         var chains = new List<PuyoGroup>();
 
@@ -1352,45 +1277,101 @@ public class PuyoManager : MonoBehaviour
         return null;
     }
 
-    //public bool HasSameColorNeighbor(Puyo puyo)
-    //{
-    //    return
-    //        // TOP
-    //        (puyo.Row < GameVariable.Rows - 1 && puyos[puyo.Row + 1, puyo.Column] != null && puyos[puyo.Row + 1, puyo.Column].GetComponent<Puyo>().Color == puyo.Color) ||
+    public IEnumerator SwagPuyo(int direction, int i, int j, int k, int count)
+    {
+        //direction -> 0 -x 1 +x 2 -z 3 +z
+        switch (direction)
+        {
+            case 0:
+                puyos[i, j, k].transform.position += new Vector3(0.1f * (count % 2 == 0 ? 1 : -1), 0, 0);
+                yield return new WaitForSeconds(0.03f);
+                puyos[i, j, k].transform.position += new Vector3(-0.1f * (count % 2 == 0 ? 1 : -1), 0, 0);
+                yield return new WaitForSeconds(0.03f);
+                break;
+            case 1:
+                puyos[i, j, k].transform.position += new Vector3(-0.1f * (count % 2 == 0 ? 1 : -1), 0, 0);
+                yield return new WaitForSeconds(0.03f);
+                puyos[i, j, k].transform.position += new Vector3(0.1f * (count % 2 == 0 ? 1 : -1), 0, 0);
+                yield return new WaitForSeconds(0.03f);
+                break;
+            case 2:
+                puyos[i, j, k].transform.position += new Vector3(0, 0, 0.1f * (count % 2 == 0 ? 1 : -1));
+                yield return new WaitForSeconds(0.03f);
+                puyos[i, j, k].transform.position += new Vector3(0, 0, -0.1f * (count % 2 == 0 ? 1 : -1));
+                yield return new WaitForSeconds(0.03f);
+                break;
+            case 3:
+                puyos[i, j, k].transform.position += new Vector3(0, 0, -0.1f * (count % 2 == 0 ? 1 : -1));
+                yield return new WaitForSeconds(0.03f);
+                puyos[i, j, k].transform.position += new Vector3(0, 0, 0.1f * (count % 2 == 0 ? 1 : -1));
+                yield return new WaitForSeconds(0.03f);
+                break;
+            default:
+                break;
+        }
+    }
+    public IEnumerator PuyoToHell(float speed, int i, int j, int k)
+    {
+        // We use this variable to store the biggest ratio, it is used to know how many time we have to wait for the tween to complete
+        var biggestRatio = 0f;
+        
+        var puyo = puyos[i, j, k];
+        var oldPosition = puyo.transform.position;
+        var newPosition = FindPuyoScreenPosition(i-30, j, k);
 
-    //        // BOT
-    //        (puyo.Row > 0 && puyos[puyo.Row - 1, puyo.Column] != null && puyos[puyo.Row - 1, puyo.Column].GetComponent<Puyo>().Color == puyo.Color) ||
+        // Position is correct, skip and continue with the next puyo
+        if (!(oldPosition.y == newPosition.y))
+        {
+            var ratio = (oldPosition.y - newPosition.y) / GameVariable.PuyoSize.y;
+            if (ratio > biggestRatio) biggestRatio = ratio;
 
-    //        // RIGHT
-    //        (puyo.Column < GameVariable.Columns - 1 && puyos[puyo.Row, puyo.Column + 1] != null && puyos[puyo.Row, puyo.Column + 1].GetComponent<Puyo>().Color == puyo.Color) ||
+            puyo.transform.positionTo(0.1f * speed * ratio, newPosition);
+        }
+        yield return new WaitForSeconds(biggestRatio * 0.1f * speed);
+    }
 
-    //        // LEFT
-    //        (puyo.Column > 0 && puyos[puyo.Row, puyo.Column - 1] != null && puyos[puyo.Row, puyo.Column - 1].GetComponent<Puyo>().Color == puyo.Color);
-    //}
+    public IEnumerator GameOverAction()
+    {
+        // 1 = Screen1, 2 = Screen2, 3 = Screen3, 4 = Screen4
+        for (int count = 0; count < 4; count++)
+        {
+            for (int i = 0; i < GameVariable.Rows; i++)
+                for (int j = 0; j < GameVariable.ColumnsA; j++)
+                    for (int k = 0; k < GameVariable.ColumnsB; k++)
+                        if (puyos[i, j, k] != null)
+                        {
+                            var pPos = puyos[i, j, k].transform.position;
+                            if (GameVariable.Scene == Control.Screen1 || GameVariable.Scene == Control.Screen3)
+                            {
+                                StartCoroutine(SwagPuyo((int)pPos.x % 2, i, j, k, count));
+                            }
+                            else if (GameVariable.Scene == Control.Screen2 || GameVariable.Scene == Control.Screen4)
+                            {
+                                StartCoroutine(SwagPuyo((int)pPos.z % 2 + 2, i, j, k, count));
+                            }
+                        }
+            yield return new WaitForSeconds(0.06f);
+        }
 
-    //private bool CheckIfAllPuyosAreWellPositioned()
-    //{
-    //    for (int i = 0; i < GameVariable.Rows; i++)
-    //    {
-    //        for (int j = 0; j < GameVariable.Columns; j++)
-    //        {
-    //            if (!IsPuyoPositionCorrect(puyos[i, j])) return false;
-    //        }
-    //    }
-    //    return true;
-    //}
+        System.Random r = new System.Random();
+        float[][] speed = new float[3][];
 
-    //private bool IsPuyoPositionCorrect(GameObject puyoGo)
-    //{
-    //    if(puyoGo == null) throw new ArgumentNullException();
-
-    //    var puyoScript = puyoGo.GetComponent<Puyo>();
-    //    var puyoPosition = puyoGo.transform.position;
-    //    var correctPosition = FindPuyoScreenPosition(puyoScript.Row, puyoScript.Column);
-    //    return puyoPosition.x == correctPosition.x && puyoPosition.y == correctPosition.y;
-    //}
+        for (int i = 0; i < 3; i++)
+        {
+            speed[i] = new float[3];
+            for (int j = 0; j < 3; j++)
+                speed[i][j] = 1 + (float)r.NextDouble()/2;
+        }
+        for (int i = 0; i < GameVariable.Rows; i++)
+            for (int j = 0; j < GameVariable.ColumnsA; j++)
+                for (int k = 0; k < GameVariable.ColumnsB; k++)
+                    if (puyos[i, j, k] != null)
+                         StartCoroutine(PuyoToHell(speed[j][k], i, j, k));
+        yield return null;
+    }
 }
 
 internal interface IEnumerarator
 {
+        
 }

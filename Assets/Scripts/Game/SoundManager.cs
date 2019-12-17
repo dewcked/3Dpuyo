@@ -51,7 +51,7 @@ public class SoundManager : MonoBehaviour {
                 _rotationSound.Play();
                 break;
             case FX.Combo:
-                _comboSound.clip = _comboSoundList[GameVariable.currentCombo];
+                _comboSound.clip = GameVariable.currentCombo>=7?_comboSoundList[6]: _comboSoundList[GameVariable.currentCombo];
                 _comboSound.Play();
                 break;
         }
