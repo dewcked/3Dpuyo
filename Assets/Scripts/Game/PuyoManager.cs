@@ -1163,23 +1163,33 @@ public class PuyoManager : MonoBehaviour
         var chains = FindAllChains();
         if (chains.Any())
         {
-            foreach (var chain in chains)
+            ProcessComboEffect();
+            StartCoroutine(AnimateAndDestroyChain(chains, secondCallBack =>
             {
-                ProcessComboEffect();
-                foreach (var puyo in chain.Puyos)
+                callBack(false);
+            }));
+        }
+        else
+            callBack(true);
+        yield return null;
+    }
+
+    public IEnumerator AnimateAndDestroyChain(List<PuyoGroup> chains, System.Action<bool> secondCallBack)
+    {
+        foreach (var chain in chains)
+        {
+            foreach (var puyo in chain.Puyos)
+            {
+                StartCoroutine(AnimateAndDestroyPuyo(puyo, thirdcallBack =>
                 {
-                    StartCoroutine(AnimateAndDestroy(puyo, innercallBack =>
-                    {
-                        callBack(false);
-                    }));
-                }
+                    secondCallBack(true);
+                }));
             }
         }
         yield return null;
-        callBack(true);
     }
 
-    public IEnumerator AnimateAndDestroy(Puyo puyo, System.Action<bool> innerCallBack)
+    public IEnumerator AnimateAndDestroyPuyo(Puyo puyo, System.Action<bool> thirdCallBack)
     {
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return new WaitForSeconds(0.25f);
@@ -1189,7 +1199,7 @@ public class PuyoManager : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
 
         DestroyPuyo(puyo);
-        innerCallBack(true);
+        thirdCallBack(true);
     }
 
     private void DestroyPuyo(Puyo puyo)

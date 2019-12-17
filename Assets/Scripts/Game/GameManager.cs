@@ -370,8 +370,7 @@ public class GameManager : MonoBehaviour {
         StartCoroutine(PuyoManager.DestroyAllChains(callBack =>
         {
             if (callBack == false)
-                PuyoManager.MovePuyosToNewPosition(callBack2 => { });
-            //gameState = GameState.Repositioning;
+                gameState = GameState.Repositioning;
             else
                 gameState = GameState.Generate;
         }));
