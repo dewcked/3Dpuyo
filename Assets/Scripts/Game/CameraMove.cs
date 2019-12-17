@@ -4,16 +4,25 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
+    GameObject _plane1;
+    GameObject _plane2;
+    bool isSceneMoving = false;
+    // Use this for initialization
+    void Awake () {
+        _plane1 = transform.FindChild("Plane").gameObject;
+        _plane2 = transform.FindChild("Plane2").gameObject;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        SceneChange();
-        AdaptChange();
-        //this.transform.RotateAround(new Vector3(1f, 1f, 1f), Vector3.left, 30 * Time.deltaTime);
+        switch (isSceneMoving)
+        {
+            case true:
+                break;
+            case false:
+                SceneChange();
+                break;
+        }
     }
 
     /// <summary>
@@ -21,9 +30,10 @@ public class CameraMove : MonoBehaviour {
     /// </summary>
     void SceneChange()
     {
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q))
         {
-            transform.RotateAround(new Vector3(1f, 1f, 1f), Vector3.up, 90f);
+            isSceneMoving = true;
+            StartCoroutine(AdaptiveChange(Vector3.up));
             switch (GameVariable.Scene)
             {
                 case Control.Screen1:
@@ -40,9 +50,10 @@ public class CameraMove : MonoBehaviour {
                     break;
             }
         }
-        else if (Input.GetKeyDown(KeyCode.E))
+        else if (Input.GetKey(KeyCode.E))
         {
-            transform.RotateAround(new Vector3(1f, 1f, 1f), Vector3.down, 90f);
+            isSceneMoving = true;
+            StartCoroutine(AdaptiveChange(Vector3.down));
             switch (GameVariable.Scene)
             {
                 case Control.Screen1:
@@ -60,9 +71,18 @@ public class CameraMove : MonoBehaviour {
             }
         }
     }
-
-    void AdaptChange()
+    //1, 1, 1을 기준으로 axis를 축으로 앵글이 점차적으로 줄어들면서 무한급수 수렴하도록 회전하는 함수
+    private IEnumerator AdaptiveChange(Vector3 axis)
     {
-
+        var leftangle = 90f;
+        while (leftangle > 0.5f)
+        {
+            leftangle /= 2;
+            transform.RotateAround(new Vector3(1f, 1f, 1f), axis, leftangle);
+            yield return new WaitForSeconds(0.05f);
+        }
+        transform.RotateAround(new Vector3(1f, 1f, 1f), axis, leftangle);
+        isSceneMoving = false;
+        yield return null;
     }
 }
