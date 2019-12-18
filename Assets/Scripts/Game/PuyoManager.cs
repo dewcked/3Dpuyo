@@ -1211,7 +1211,7 @@ public class PuyoManager : MonoBehaviour
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return waitTime;
 
-        Instantiate(effect, puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].transform.position, Quaternion.identity);
+        Instantiate(effect, new Vector3(puyo.Row, puyo.ColumnA, puyo.ColumnB), Quaternion.identity);
 
         DestroyPuyo(puyo);
         thirdCallBack(true);
@@ -1268,72 +1268,79 @@ public class PuyoManager : MonoBehaviour
         {
             var pi = nextPuyosToCheck.First();
             var nextInChain = FindNextPuyoInChain(pi, currentChain);
-            while (nextInChain != null)
+
+            nextInChain.ForEach((chain) =>
             {
-                currentChain.Add(nextInChain);
-                nextPuyosToCheck.Add(nextInChain);
-                nextInChain = FindNextPuyoInChain(pi, currentChain);
-            }
+                currentChain.Add(chain);
+                nextPuyosToCheck.Add(chain);
+            });
+
             nextPuyosToCheck.Remove(pi);
         }
 
         return currentChain.Count >= GameVariable.MinimumMatches ? new PuyoGroup(currentChain) : null;
     }
 
-    private Puyo FindNextPuyoInChain(Puyo puyo, IEnumerable<Puyo> ignoredPuyos)
+    private List<Puyo> FindNextPuyoInChain(Puyo puyo, IEnumerable<Puyo> ignoredPuyos)
     {
         var ignoredList = ignoredPuyos.ToList();
+        List<Puyo> SearchList = new List<Puyo>();
 
         // Top
-        if (puyo.Row < GameVariable.Rows - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row + 1 && p.ColumnA == puyo.ColumnA)))
+        if (puyo.Row < GameVariable.Rows - 1 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row + 1 && p.ColumnA == puyo.ColumnA && p.ColumnB == puyo.ColumnB)))
         {
             var topPuyo = puyos[puyo.Row + 1, puyo.ColumnA, puyo.ColumnB];
             if (topPuyo != null && topPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return topPuyo.GetComponent<Puyo>();
+                SearchList.Add(topPuyo.GetComponent<Puyo>());
         }
 
         // Bottom
-        if (puyo.Row > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row - 1 && p.ColumnA == puyo.ColumnA)))
+        if (puyo.Row > 0 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row - 1 && p.ColumnA == puyo.ColumnA && p.ColumnB == puyo.ColumnB)))
         {
             var bottomPuyo = puyos[puyo.Row - 1, puyo.ColumnA, puyo.ColumnB];
             if (bottomPuyo != null && bottomPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return bottomPuyo.GetComponent<Puyo>();
+                SearchList.Add(bottomPuyo.GetComponent<Puyo>());
         }
 
         // Right
-        if (puyo.ColumnA < GameVariable.ColumnsA - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA + 1)))
+        if (puyo.ColumnA < GameVariable.ColumnsA - 1 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA + 1 && p.ColumnB == puyo.ColumnB)))
         {
             var rightPuyo = puyos[puyo.Row, puyo.ColumnA + 1, puyo.ColumnB];
             if (rightPuyo != null && rightPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return rightPuyo.GetComponent<Puyo>();
+                SearchList.Add(rightPuyo.GetComponent<Puyo>());
         }
 
         // Left
-        if (puyo.ColumnA > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA - 1)))
+        if (puyo.ColumnA > 0 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA - 1 && p.ColumnB == puyo.ColumnB)))
         {
             var leftPuyo = puyos[puyo.Row, puyo.ColumnA - 1, puyo.ColumnB];
             if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return leftPuyo.GetComponent<Puyo>();
+                SearchList.Add(leftPuyo.GetComponent<Puyo>());
         }
 
         // Back
-        if (puyo.ColumnB < GameVariable.ColumnsB - 1 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnB == puyo.ColumnB + 1)))
+        if (puyo.ColumnB < GameVariable.ColumnsB - 1 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA && p.ColumnB == puyo.ColumnB + 1)))
         {
-            var rightPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB + 1];
-            if (rightPuyo != null && rightPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return rightPuyo.GetComponent<Puyo>();
+            var backPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB + 1];
+            if (backPuyo != null && backPuyo.GetComponent<Puyo>().Color == puyo.Color)
+                SearchList.Add(backPuyo.GetComponent<Puyo>());
         }
 
         // Forth
-        if (puyo.ColumnB > 0 && (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnB == puyo.ColumnB - 1)))
+        if (puyo.ColumnB > 0 &&
+            (ignoredPuyos == null || !ignoredList.Any(p => p.Row == puyo.Row && p.ColumnA == puyo.ColumnA && p.ColumnB == puyo.ColumnB - 1)))
         {
-            var leftPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB - 1];
-            if (leftPuyo != null && leftPuyo.GetComponent<Puyo>().Color == puyo.Color)
-                return leftPuyo.GetComponent<Puyo>();
+            var forthPuyo = puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB - 1];
+            if (forthPuyo != null && forthPuyo.GetComponent<Puyo>().Color == puyo.Color)
+                SearchList.Add(forthPuyo.GetComponent<Puyo>());
         }
-
         // Nothing is found, return null
-        return null;
+        return SearchList;
     }
 
     public IEnumerator SwagPuyo(int direction, int i, int j, int k, int count)
