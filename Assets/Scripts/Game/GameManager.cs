@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour {
     void Awake () {
         PuyoManager = transform.FindChild("PuyoManager").gameObject.GetComponent<PuyoManager>();
         gameState = GameState.Generate;
+        GameVariable.Scene = Control.Screen1;
     }
 	
 	// Update is called once per frame
