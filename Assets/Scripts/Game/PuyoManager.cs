@@ -16,12 +16,10 @@ public class PuyoManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] puyoPrefabs;
-    GameObject effect;
     public SoundManager SoundManager;
 
     void Awake()
     {
-        effect = Resources.Load("FireExplosionEffects/PlasmaExplosionEffect") as GameObject;
         SoundManager = transform.FindChild("SoundManager").gameObject.GetComponent<SoundManager>();
     }
 
@@ -1211,7 +1209,27 @@ public class PuyoManager : MonoBehaviour
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return waitTime;
 
+        GameObject effect; 
+
+        if (puyo.Color.Equals("Green"))
+        {
+            effect = Resources.Load("effect/greenPlasmaExplosionEffect") as GameObject;
+        }
+        else if (puyo.Color.Equals("Blue"))
+        {
+            effect = Resources.Load("effect/bluePlasmaExplosionEffect") as GameObject;
+        }
+        else if (puyo.Color.Equals("Red"))
+        {
+            effect = Resources.Load("effect/RedPlasmaExplosionEffect") as GameObject;
+        }
+        else
+        {
+            effect = Resources.Load("effect/YellowPlasmaExplosionEffect") as GameObject;
+        }
+
         Instantiate(effect, puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].transform.position, Quaternion.identity);
+
 
         DestroyPuyo(puyo);
         thirdCallBack(true);
