@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CameraMove : MonoBehaviour {
     readonly GameObject[] planes = new GameObject[16];
+    readonly GameObject[] planesb = new GameObject[11];
     bool isSceneMoving = false;
     // Use this for initialization
     void Awake () {
@@ -11,11 +12,14 @@ public class CameraMove : MonoBehaviour {
         {
             planes[i] = transform.FindChild("Plane" + i).gameObject;
         }
+        for (int i = 1; i <= 10; i++)
+        {
+            planesb[i] = transform.FindChild("Planeb" + i).gameObject;
+        }
     }
-	
-	// Update is called once per frame
-	void Update () {
-        for(int i = 1; i <= 15; i++)
+    // Update is called once per frame
+    void Update () {
+        for (int i = 1; i <= 15; i++)
         {
             if (planes[i].transform.localPosition.x <= -30)
                 planes[i].transform.localPosition += new Vector3(50f, 0, 0);
@@ -97,18 +101,28 @@ public class CameraMove : MonoBehaviour {
     private IEnumerator AdaptiveMove(Vector3 direction)
     {
         var target = 5f;
+        var target2 = 2f;
         while (target > 0.1f)
         {
             target /= 2;
+            target2 /= 2;
             for(int i = 1; i <= 15; i++)
             {
                 planes[i].transform.localPositionTo(0.05f, new Vector3(planes[i].transform.localPosition.x + direction.x * target, planes[i].transform.localPosition.y, planes[i].transform.localPosition.z));
+            }
+            for (int i = 1; i <= 10; i++)
+            {
+                planesb[i].transform.localPositionTo(0.05f, new Vector3(planesb[i].transform.localPosition.x + direction.x * target2, planesb[i].transform.localPosition.y, planesb[i].transform.localPosition.z));
             }
             yield return new WaitForSeconds(0.05f);
         }
         for (int i = 1; i <= 15; i++)
         {
             planes[i].transform.localPositionTo(0.05f, new Vector3(planes[i].transform.localPosition.x + direction.x * target, planes[i].transform.localPosition.y, planes[i].transform.localPosition.z));
+        }
+        for (int i = 1; i <= 10; i++)
+        {
+            planesb[i].transform.localPositionTo(0.05f, new Vector3(planesb[i].transform.localPosition.x + direction.x * target2, planesb[i].transform.localPosition.y, planesb[i].transform.localPosition.z));
         }
         //isSceneMoving = false;
         //yield return null;
