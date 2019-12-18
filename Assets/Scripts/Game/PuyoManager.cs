@@ -1405,7 +1405,7 @@ public class PuyoManager : MonoBehaviour
 
         float[] distances = new float[7];
         
-        Debug.Log(targety);
+        //Debug.Log(targety);
         for(i = 0; i < 7; i++)
         {
             var t = targety / 2;
