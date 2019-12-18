@@ -174,7 +174,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 1
@@ -384,13 +384,13 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       minMaxState: 0
     startSize:
-      scalar: 1.3
+      scalar: 3
       maxCurve:
         serializedVersion: 2
         m_Curve:
         - serializedVersion: 2
           time: 0
-          value: 0.6923077
+          value: 0.33333334
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -2721,7 +2721,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
@@ -5346,7 +5346,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
@@ -5544,7 +5544,7 @@ ParticleSystem:
       maxColor: {r: 0.10980392, g: 0.15294118, b: 0.24313726, a: 1}
       minMaxState: 0
     startSize:
-      scalar: 0.8
+      scalar: 3
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -5562,7 +5562,7 @@ ParticleSystem:
         m_Curve:
         - serializedVersion: 2
           time: 0
-          value: 0.50000006
+          value: 0.33333334
           inSlope: 0
           outSlope: 0
           tangentMode: 0
@@ -7851,7 +7851,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 1
@@ -10488,7 +10488,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
@@ -10698,7 +10698,7 @@ ParticleSystem:
       maxColor: {r: 1, g: 1, b: 1, a: 1}
       minMaxState: 0
     startSize:
-      scalar: 0.04
+      scalar: 0.1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -13132,8 +13132,8 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: eb48ed523ad44c841b7575601d8df7fd, type: 2}
-  - {fileID: 2100000, guid: eb48ed523ad44c841b7575601d8df7fd, type: 2}
+  - {fileID: 2100000, guid: 8d1b6b4c4087d084f964514e50e14698, type: 2}
+  - {fileID: 2100000, guid: 8d1b6b4c4087d084f964514e50e14698, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13182,8 +13182,8 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: bd5100d7fcf446b46aa3888499bb7a7d, type: 2}
-  - {fileID: 2100000, guid: bd5100d7fcf446b46aa3888499bb7a7d, type: 2}
+  - {fileID: 2100000, guid: a5fdeb3fe0f173d418d7d78be09af918, type: 2}
+  - {fileID: 2100000, guid: a5fdeb3fe0f173d418d7d78be09af918, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13232,8 +13232,8 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: b4e140f15b04c3240bb0a9171a6507d9, type: 2}
-  - {fileID: 2100000, guid: b4e140f15b04c3240bb0a9171a6507d9, type: 2}
+  - {fileID: 2100000, guid: 72b463e41d0cf7243b2625704a61fdbb, type: 2}
+  - {fileID: 2100000, guid: 72b463e41d0cf7243b2625704a61fdbb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -13282,8 +13282,8 @@ ParticleSystemRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6a46ad36949aac247afb470f8adadecb, type: 2}
-  - {fileID: 2100000, guid: 6a46ad36949aac247afb470f8adadecb, type: 2}
+  - {fileID: 2100000, guid: 753cb9027890d5e4494729a17a9dfd8f, type: 2}
+  - {fileID: 2100000, guid: 753cb9027890d5e4494729a17a9dfd8f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
