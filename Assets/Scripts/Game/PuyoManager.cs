@@ -1211,7 +1211,7 @@ public class PuyoManager : MonoBehaviour
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return waitTime;
 
-        Instantiate(effect, new Vector3(puyo.Row, puyo.ColumnA, puyo.ColumnB), Quaternion.identity);
+        Instantiate(effect, new Vector3(puyo.ColumnA, puyo.Row, puyo.ColumnB), Quaternion.identity);
 
         DestroyPuyo(puyo);
         thirdCallBack(true);
