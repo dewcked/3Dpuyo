@@ -86,8 +86,7 @@ public class GameManager : MonoBehaviour {
                 //Time.timeScale = 0f; // todo
                 break;
             case GameState.WaitingForInput:
-                if (Input.anyKey)
-                    SceneManager.LoadScene("End");
+                SceneManager.LoadScene("End");
                 break;
             default:
                 throw new System.ArgumentOutOfRangeException();
