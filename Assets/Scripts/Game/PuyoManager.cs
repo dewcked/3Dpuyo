@@ -16,12 +16,10 @@ public class PuyoManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] puyoPrefabs;
-    GameObject effect;
     public SoundManager SoundManager;
 
     void Awake()
     {
-        effect = Resources.Load("FireExplosionEffects/PlasmaExplosionEffect") as GameObject;
         SoundManager = transform.FindChild("SoundManager").gameObject.GetComponent<SoundManager>();
     }
 
@@ -1211,7 +1209,6 @@ public class PuyoManager : MonoBehaviour
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return waitTime;
 
-        Instantiate(effect, new Vector3(puyo.ColumnA, puyo.Row, puyo.ColumnB), Quaternion.identity);
 
         DestroyPuyo(puyo);
         thirdCallBack(true);
