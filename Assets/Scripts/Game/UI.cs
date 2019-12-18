@@ -9,6 +9,8 @@ public class UI : MonoBehaviour {
     private GameObject pillarPrefab;
     [SerializeField]
     private GameObject bottomPrefab;
+    [SerializeField]
+    private GameObject nextWindow;
 
     private GameObject[] pillars = new GameObject[4];
     private GameObject bottom;
@@ -24,6 +26,8 @@ public class UI : MonoBehaviour {
 
         bottom = Instantiate(bottomPrefab, new Vector3(-1.5f, -0.3f, -1.5f), Quaternion.identity) as GameObject;
         bottom.transform.localScale = new Vector3(125f, 125f, 125f);
+
+        nextWindow.transform.position = new Vector3(7.5f, 8.2f, 0f);
     }
 	
 	// Update is called once per frame
