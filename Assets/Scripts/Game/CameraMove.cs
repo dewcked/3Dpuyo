@@ -3,18 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraMove : MonoBehaviour {
-
-    GameObject _plane1;
-    GameObject _plane2;
+    readonly GameObject[] planes = new GameObject[16];
     bool isSceneMoving = false;
     // Use this for initialization
     void Awake () {
-        _plane1 = transform.FindChild("Plane").gameObject;
-        _plane2 = transform.FindChild("Plane2").gameObject;
+        for(int i = 1; i <= 15; i++)
+        {
+            planes[i] = transform.FindChild("Plane" + i).gameObject;
+        }
     }
 	
 	// Update is called once per frame
 	void Update () {
+        for(int i = 1; i <= 15; i++)
+        {
+            if (planes[i].transform.localPosition.x <= -30)
+                planes[i].transform.localPosition += new Vector3(50f, 0, 0);
+            else if (planes[i].transform.localPosition.x >= 30)
+                planes[i].transform.localPosition += new Vector3(-50f, 0, 0);
+        }
         switch (isSceneMoving)
         {
             case true:
@@ -33,7 +40,8 @@ public class CameraMove : MonoBehaviour {
         if (Input.GetKey(KeyCode.Q))
         {
             isSceneMoving = true;
-            StartCoroutine(AdaptiveChange(Vector3.up));
+            StartCoroutine(AdaptiveRotate(Vector3.up));
+            StartCoroutine(AdaptiveMove(Vector3.left));
             switch (GameVariable.Scene)
             {
                 case Control.Screen1:
@@ -53,7 +61,8 @@ public class CameraMove : MonoBehaviour {
         else if (Input.GetKey(KeyCode.E))
         {
             isSceneMoving = true;
-            StartCoroutine(AdaptiveChange(Vector3.down));
+            StartCoroutine(AdaptiveRotate(Vector3.down));
+            StartCoroutine(AdaptiveMove(Vector3.right));
             switch (GameVariable.Scene)
             {
                 case Control.Screen1:
@@ -72,7 +81,7 @@ public class CameraMove : MonoBehaviour {
         }
     }
     //1, 1, 1을 기준으로 axis를 축으로 앵글이 점차적으로 줄어들면서 무한급수 수렴하도록 회전하는 함수
-    private IEnumerator AdaptiveChange(Vector3 axis)
+    private IEnumerator AdaptiveRotate(Vector3 axis)
     {
         var leftangle = 90f;
         while (leftangle > 0.5f)
@@ -83,6 +92,26 @@ public class CameraMove : MonoBehaviour {
         }
         transform.RotateAround(new Vector3(1f, 1f, 1f), axis, leftangle);
         isSceneMoving = false;
+        yield return null;
+    }
+    private IEnumerator AdaptiveMove(Vector3 direction)
+    {
+        var target = 5f;
+        while (target > 0.1f)
+        {
+            target /= 2;
+            for(int i = 1; i <= 15; i++)
+            {
+                planes[i].transform.localPositionTo(0.05f, new Vector3(planes[i].transform.localPosition.x + direction.x * target, planes[i].transform.localPosition.y, planes[i].transform.localPosition.z));
+            }
+            yield return new WaitForSeconds(0.05f);
+        }
+        for (int i = 1; i <= 15; i++)
+        {
+            planes[i].transform.localPositionTo(0.05f, new Vector3(planes[i].transform.localPosition.x + direction.x * target, planes[i].transform.localPosition.y, planes[i].transform.localPosition.z));
+        }
+        //isSceneMoving = false;
+        //yield return null;
         yield return null;
     }
 }
