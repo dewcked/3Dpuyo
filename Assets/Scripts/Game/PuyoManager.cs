@@ -16,11 +16,12 @@ public class PuyoManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] puyoPrefabs;
-    public GameObject effect;
+    GameObject effect;
     public SoundManager SoundManager;
 
     void Awake()
     {
+        effect = Resources.Load("FireExplosionEffects/PlasmaExplosionEffect") as GameObject;
         SoundManager = transform.FindChild("SoundManager").gameObject.GetComponent<SoundManager>();
     }
 
