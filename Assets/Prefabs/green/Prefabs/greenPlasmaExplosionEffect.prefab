@@ -2721,7 +2721,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
@@ -5346,7 +5346,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
@@ -7851,7 +7851,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 1
@@ -10488,7 +10488,7 @@ ParticleSystem:
   serializedVersion: 5
   lengthInSec: 2
   speed: 1
-  looping: 0
+  looping: 1
   prewarm: 0
   playOnAwake: 1
   autoRandomSeed: 0
