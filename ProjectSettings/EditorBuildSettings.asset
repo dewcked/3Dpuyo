@@ -9,3 +9,5 @@ EditorBuildSettings:
     path: Assets/Scenes/start.unity
   - enabled: 1
     path: Assets/Scenes/Gameplay.unity
+  - enabled: 1
+    path: Assets/Scenes/End.unity
