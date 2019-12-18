@@ -19,9 +19,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4949452281286702}
-  - component: {fileID: 114067258570097764}
   - component: {fileID: 33621131563016050}
   - component: {fileID: 23105008666546038}
+  - component: {fileID: 114067258570097764}
   m_Layer: 0
   m_Name: tileGreen
   m_TagString: Green
