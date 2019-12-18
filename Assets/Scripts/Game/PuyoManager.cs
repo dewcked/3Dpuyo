@@ -16,7 +16,7 @@ public class PuyoManager : MonoBehaviour
 
     [SerializeField]
     private GameObject[] puyoPrefabs;
-
+    public GameObject effect;
     public SoundManager SoundManager;
 
     void Awake()
@@ -1209,6 +1209,8 @@ public class PuyoManager : MonoBehaviour
         yield return waitTime;
         puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].SetActive(false);
         yield return waitTime;
+
+        Instantiate(effect, puyos[puyo.Row, puyo.ColumnA, puyo.ColumnB].transform.position, Quaternion.identity);
 
         DestroyPuyo(puyo);
         thirdCallBack(true);
