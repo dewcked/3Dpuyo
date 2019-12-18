@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour {
         // 0 = Game over, 1 = Danger, 2 = Normal
         StartCoroutine(PuyoManager.FixPair(callBack =>
         {
-            if (callBack == 1)
+            if (callBack == 0)
                 gameState = GameState.GameOver;
             else
                 gameState = GameState.Repositioning;

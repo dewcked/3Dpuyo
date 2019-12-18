@@ -40,9 +40,15 @@ public class SoundManager : MonoBehaviour {
         {
             case FX.BGM:
                 if (GameVariable.isDanger == true && _BGM.clip.name != "Warn")
+                {
                     _BGM.clip = _BGMList[1];
+                    _BGM.Play();
+                }
                 else if (_BGM.clip.name == "Warn")
+                {
                     _BGM.clip = _BGMList[0];
+                    _BGM.Play();
+                }
                 break;
             case FX.Move:
                 _moveSound.Play();
@@ -58,6 +64,8 @@ public class SoundManager : MonoBehaviour {
     }
     public void StopSound()
     {
-        _BGM.Stop();
+        _BGM.clip = Resources.Load<AudioClip>("gameOver");
+        _BGM.loop = false;
+        _BGM.Play();
     }
 }
