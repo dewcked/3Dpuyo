@@ -1431,7 +1431,7 @@ public class PuyoManager : MonoBehaviour
                 for (int k = 0; k < GameVariable.ColumnsB; k++)
                     if (puyos[i, j, k] != null)
                          StartCoroutine(PuyoToHell(speed[j][k], i, j, k));
-        yield return new WaitForSeconds(5f);
+        yield return new WaitForSeconds(3f);
         callBack(true);
     }
 }
