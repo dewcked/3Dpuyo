@@ -1211,15 +1211,15 @@ public class PuyoManager : MonoBehaviour
 
         GameObject effect;
 
-        if (puyo.Color.Equals("Green"))
+        if (puyo.tag.Equals("Green"))
         {
             effect = Resources.Load("effect/greenPlasmaExplosionEffect") as GameObject;
         }
-        else if (puyo.Color.Equals("Blue"))
+        else if (puyo.tag.Equals("Blue"))
         {
             effect = Resources.Load("effect/bluePlasmaExplosionEffect") as GameObject;
         }
-        else if (puyo.Color.Equals("Red"))
+        else if (puyo.tag.Equals("Red"))
         {
             effect = Resources.Load("effect/RedPlasmaExplosionEffect") as GameObject;
         }
