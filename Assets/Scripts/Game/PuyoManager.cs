@@ -165,18 +165,19 @@ public class PuyoManager : MonoBehaviour
         for (int i = 0; i < GameVariable.ColumnsA; i++)
             for (int j = 0; j < GameVariable.ColumnsB; j++)
             {
-                if (puyos[7, i, j] != null)
+                if (puyos[8, i, j] != null)
                 {
                     dangerStack += 1;
                 }
             }
-        if(dangerStack > 7)
+        if (dangerStack > 7)
         {
             GameVariable.isDanger = true;
             SoundManager.PlaySound(FX.BGM);
             return true;
         }
         GameVariable.isDanger = false;
+        SoundManager.PlaySound(FX.BGM);
         return false;
     }
 

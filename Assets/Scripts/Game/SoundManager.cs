@@ -39,9 +39,10 @@ public class SoundManager : MonoBehaviour {
         switch (fx)
         {
             case FX.BGM:
-                if (GameVariable.isDanger == true && _BGM.clip.name != "Warn")
+                if (GameVariable.isDanger == true)
                 {
-                    _BGM.clip = _BGMList[1];
+                    if(_BGM.clip.name != "Warn")
+                        _BGM.clip = _BGMList[1];
                     _BGM.Play();
                 }
                 else if (_BGM.clip.name == "Warn")
